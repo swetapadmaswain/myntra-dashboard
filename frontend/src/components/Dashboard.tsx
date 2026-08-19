@@ -5,8 +5,13 @@ import { useQuery } from '@tanstack/react-query';
 import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
 import { SnippetList } from './SnippetList';
+import { FrictionBarChart } from './FrictionBarChart';
+import { IntentRadarChart } from './IntentRadarChart';
+import { JourneyFlowChart } from './JourneyFlowChart';
+import { OpportunityScatterPlot } from './OpportunityScatterPlot';
 import { fetchMetrics, fetchSnippets } from '@/services/api';
 import { useDashboardStore } from '@/store/dashboardStore';
+import { frictionMock, intentMock, journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
 
 export function Dashboard() {
   const { tab, setTab, filters, setFilter, resetFilters } = useDashboardStore();
@@ -100,9 +105,10 @@ export function Dashboard() {
               {tab === 'journey' && 'Journey Tracker'}
               {tab === 'opportunity' && 'Opportunity Matrix'}
             </h2>
-            <p className="text-sm text-myntra-text-light">
-              This tab would render a chart component. Charts are left as an extension hook for Phase 7.9.
-            </p>
+            {tab === 'friction' && <FrictionBarChart data={frictionMock} />}
+            {tab === 'intent' && <IntentRadarChart data={intentMock} />}
+            {tab === 'journey' && <JourneyFlowChart data={journeyMock} />}
+            {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityMock} />}
           </div>
         </div>
 
@@ -113,7 +119,7 @@ export function Dashboard() {
           {snippetsLoading ? (
             <div className="rounded-xl bg-white p-8 text-center shadow-sm">Loading snippets...</div>
           ) : (
-            <SnippetList snippets={snippetsData?.snippets || []} />
+            <SnippetList snippets={snippetsData?.snippets || snippetMock} />
           )}
         </div>
       </main>
