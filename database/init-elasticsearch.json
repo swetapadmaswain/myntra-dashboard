@@ -1,0 +1,73 @@
+{
+  "mappings": {
+    "properties": {
+      "text": {
+        "type": "text",
+        "analyzer": "english_stemmer",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "source": {
+        "type": "keyword"
+      },
+      "sentiment": {
+        "type": "keyword"
+      },
+      "hesitation_driver": {
+        "type": "keyword"
+      },
+      "entities": {
+        "type": "nested",
+        "properties": {
+          "text": {
+            "type": "text",
+            "analyzer": "english_stemmer"
+          },
+          "label": {
+            "type": "keyword"
+          }
+        }
+      },
+      "timestamp": {
+        "type": "date"
+      },
+      "author": {
+        "type": "keyword"
+      },
+      "createdAt": {
+        "type": "date"
+      }
+    }
+  },
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 1,
+    "analysis": {
+      "analyzer": {
+        "english_stemmer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "english_stop",
+            "english_stem"
+          ]
+        }
+      },
+      "filter": {
+        "english_stop": {
+          "type": "stop",
+          "stopwords": "_english_"
+        },
+        "english_stem": {
+          "type": "stemmer",
+          "language": "english"
+        }
+      }
+    }
+  }
+}
