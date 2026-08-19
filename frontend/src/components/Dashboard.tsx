@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
@@ -15,14 +14,13 @@ import { frictionMock, intentMock, journeyMock, opportunityMock, snippetMock } f
 
 export function Dashboard() {
   const { tab, setTab, filters, setFilter, resetFilters } = useDashboardStore();
-  const [search, setSearch] = useState(filters.searchQuery);
 
-  const { data: metrics, isLoading: metricsLoading } = useQuery({
+  const { data: metrics, isLoading: metricsLoading, isError: metricsError } = useQuery({
     queryKey: ['metrics'],
     queryFn: fetchMetrics,
   });
 
-  const { data: snippetsData, isLoading: snippetsLoading } = useQuery({
+  const { data: snippetsData, isLoading: snippetsLoading, isError: snippetsError } = useQuery({
     queryKey: ['snippets', filters],
     queryFn: () =>
       fetchSnippets({

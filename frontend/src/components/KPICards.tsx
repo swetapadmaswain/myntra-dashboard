@@ -6,22 +6,23 @@ interface KPICardsProps {
     primary_hesitation_driver?: string;
     primary_hesitation_percentage?: number;
     sentiment_distribution?: Record<string, number>;
+    intent_distribution?: Record<string, number>;
   };
 }
 
 export function KPICards({ metrics }: KPICardsProps) {
   const totalSentiment = Object.values(metrics.sentiment_distribution || {}).reduce((a, b) => a + b, 0);
-  const negative = metrics.sentiment_distribution?.negative || 0;
-  const negativePct = totalSentiment ? ((negative / totalSentiment) * 100).toFixed(1) : '0';
+  const neutral = metrics.sentiment_distribution?.neutral || 0;
+  const neutralPct = totalSentiment ? ((neutral / totalSentiment) * 100).toFixed(1) : '0';
   const driver = metrics.primary_hesitation_driver
     ? `${metrics.primary_hesitation_driver} (${metrics.primary_hesitation_percentage?.toFixed(1)}%)`
     : '—';
 
   const cards = [
-    { label: 'Total Signals', value: metrics.total_signals ?? 0, sub: 'All sources' },
-    { label: 'Bookmarking Intent', value: `${(metrics.bookmarking_intent ?? 0).toFixed(1)}%`, sub: 'Wishlist intent' },
-    { label: 'Primary Hesitation', value: driver, sub: 'Top driver' },
-    { label: 'Negative Sentiment', value: `${negativePct}%`, sub: `${negative} mentions` },
+    { label: 'Total Signals', value: metrics.total_signals ?? 0, sub: 'Processed snippets' },
+    { label: 'Wishlist Intent', value: `${(metrics.bookmarking_intent ?? 0).toFixed(1)}%`, sub: 'Bookmarking users' },
+    { label: 'Top Hesitation', value: driver, sub: 'Why people hold back' },
+    { label: 'Neutral Sentiment', value: `${neutralPct}%`, sub: `${neutral} mentions` },
   ];
 
   return (

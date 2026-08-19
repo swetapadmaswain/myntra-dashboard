@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { FilterState, TabKey } from '@/types';
 
 interface DashboardStore {
@@ -19,18 +18,13 @@ const initialFilters: FilterState = {
   limit: 20,
 };
 
-export const useDashboardStore = create<DashboardStore>()(
-  persist(
-    (set) => ({
-      tab: 'friction',
-      setTab: (tab) => set({ tab }),
-      filters: initialFilters,
-      setFilter: (key, value) =>
-        set((state) => ({
-          filters: { ...state.filters, [key]: value, page: 1 },
-        })),
-      resetFilters: () => set({ filters: initialFilters }),
-    }),
-    { name: 'dashboard-filters' }
-  )
-);
+export const useDashboardStore = create<DashboardStore>((set) => ({
+  tab: 'friction',
+  setTab: (tab) => set({ tab }),
+  filters: initialFilters,
+  setFilter: (key, value) =>
+    set((state) => ({
+      filters: { ...state.filters, [key]: value, page: 1 },
+    })),
+  resetFilters: () => set({ filters: initialFilters }),
+}));
