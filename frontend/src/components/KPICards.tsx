@@ -1,19 +1,27 @@
 interface KPICardsProps {
   metrics: {
-    total_snippets?: number;
-    avg_sentiment_score?: number;
-    top_friction_driver?: string;
-    top_intent?: string;
-    snippet_growth_rate?: number;
+    total_signals?: number;
+    bookmarking_intent?: number;
+    immediate_purchase_intent?: number;
+    primary_hesitation_driver?: string;
+    primary_hesitation_percentage?: number;
+    sentiment_distribution?: Record<string, number>;
   };
 }
 
 export function KPICards({ metrics }: KPICardsProps) {
+  const totalSentiment = Object.values(metrics.sentiment_distribution || {}).reduce((a, b) => a + b, 0);
+  const negative = metrics.sentiment_distribution?.negative || 0;
+  const negativePct = totalSentiment ? ((negative / totalSentiment) * 100).toFixed(1) : '0';
+  const driver = metrics.primary_hesitation_driver
+    ? `${metrics.primary_hesitation_driver} (${metrics.primary_hesitation_percentage?.toFixed(1)}%)`
+    : '—';
+
   const cards = [
-    { label: 'Total Snippets', value: metrics.total_snippets ?? 0, sub: 'All sources' },
-    { label: 'Avg Sentiment', value: (metrics.avg_sentiment_score ?? 0).toFixed(2), sub: '-1 to +1' },
-    { label: 'Top Friction', value: metrics.top_friction_driver ?? '—', sub: 'Most reported' },
-    { label: 'Top Intent', value: metrics.top_intent ?? '—', sub: 'Dominant intent' },
+    { label: 'Total Signals', value: metrics.total_signals ?? 0, sub: 'All sources' },
+    { label: 'Bookmarking Intent', value: `${(metrics.bookmarking_intent ?? 0).toFixed(1)}%`, sub: 'Wishlist intent' },
+    { label: 'Primary Hesitation', value: driver, sub: 'Top driver' },
+    { label: 'Negative Sentiment', value: `${negativePct}%`, sub: `${negative} mentions` },
   ];
 
   return (
