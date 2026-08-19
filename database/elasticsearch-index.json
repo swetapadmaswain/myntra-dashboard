@@ -1,0 +1,131 @@
+{
+  "settings": {
+    "number_of_shards": 3,
+    "number_of_replicas": 1,
+    "analysis": {
+      "analyzer": {
+        "english_stemmer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "english_stop",
+            "english_stem"
+          ]
+        },
+        "fashion_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "english_stop",
+            "fashion_synonym"
+          ]
+        }
+      },
+      "filter": {
+        "english_stop": {
+          "type": "stop",
+          "stopwords": "_english_"
+        },
+        "english_stem": {
+          "type": "stemmer",
+          "language": "english"
+        },
+        "fashion_synonym": {
+          "type": "synonym",
+          "synonyms": [
+            "dress,frock,gown",
+            "shoes,footwear,sneakers",
+            "shirt,top,tee",
+            "pants,trousers,jeans",
+            "jacket,coat,outerwear",
+            "kurta,ethnic,traditional",
+            "fit,size,sizing"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "text": {
+        "type": "text",
+        "analyzer": "english_stemmer",
+        "search_analyzer": "english_stemmer",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "fashion": {
+            "type": "text",
+            "analyzer": "fashion_analyzer"
+          }
+        }
+      },
+      "source": {
+        "type": "keyword"
+      },
+      "sentiment": {
+        "type": "keyword"
+      },
+      "hesitation_driver": {
+        "type": "keyword"
+      },
+      "entities": {
+        "type": "nested",
+        "properties": {
+          "text": {
+            "type": "text",
+            "analyzer": "english_stemmer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "label": {
+            "type": "keyword"
+          },
+          "confidence": {
+            "type": "float"
+          }
+        }
+      },
+      "metadata": {
+        "type": "object",
+        "dynamic": true
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "author": {
+        "type": "keyword"
+      },
+      "source_url": {
+        "type": "keyword",
+        "index": false
+      },
+      "upvotes": {
+        "type": "integer"
+      },
+      "replies": {
+        "type": "integer"
+      },
+      "processed": {
+        "type": "boolean"
+      },
+      "createdAt": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "updatedAt": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      }
+    }
+  }
+}

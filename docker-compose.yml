@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: myntra_user
       POSTGRES_PASSWORD: myntra_password
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -107,7 +107,7 @@ services:
       ELASTICSEARCH_PORT: 9200
       NLP_SERVICE_URL: http://nlp-service:8000
       ANALYTICS_SERVICE_URL: http://analytics-service:8001
-      DATA_INGESTION_URL: http://data-ingestion:8002
+      DATA_INGESTION_SERVICE_URL: http://data-ingestion:8002
       JWT_SECRET: your-jwt-secret-key-change-in-production
     depends_on:
       postgres:
@@ -120,9 +120,6 @@ services:
         condition: service_healthy
     networks:
       - myntra-network
-    volumes:
-      - ./backend/api-gateway:/app
-      - /app/node_modules
 
   # Data Ingestion Service (Python/FastAPI)
   data-ingestion:
@@ -148,6 +145,7 @@ services:
       REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID}
       REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET}
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      NLP_SERVICE_URL: http://nlp-service:8000
     depends_on:
       postgres:
         condition: service_healthy

@@ -7,6 +7,7 @@ db = db.getSiblingDB('myntra_dashboard');
 db.createCollection('raw_conversations');
 
 // Create indexes for raw_conversations
+db.raw_conversations.createIndex({ text: 'text' });
 db.raw_conversations.createIndex({ source: 1 });
 db.raw_conversations.createIndex({ timestamp: -1 });
 db.raw_conversations.createIndex({ sentiment: 1 });
