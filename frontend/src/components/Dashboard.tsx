@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
@@ -13,6 +14,9 @@ import { useDashboardStore } from '@/store/dashboardStore';
 import { frictionMock, intentMock, journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
 
 export function Dashboard() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const { tab, setTab, filters, setFilter, resetFilters } = useDashboardStore();
 
   const { data: metrics, isLoading: metricsLoading, isError: metricsError } = useQuery({
@@ -30,6 +34,14 @@ export function Dashboard() {
         hesitation_driver: filters.hesitation_driver,
       }),
   });
+
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-myntra-gray">
+        <p className="text-myntra-text-light">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-myntra-gray p-4 md:p-6 lg:p-8">
