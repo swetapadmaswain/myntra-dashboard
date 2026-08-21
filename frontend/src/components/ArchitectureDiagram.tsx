@@ -6,138 +6,83 @@ export function ArchitectureDiagram() {
       <h3 className="mb-2 text-lg font-semibold text-myntra-text-dark">Dashboard Architecture</h3>
       <p className="mb-6 text-sm text-myntra-text-light">Complete data pipeline from ingestion to dashboard visualization.</p>
 
-      <div className="flex flex-col items-center">
-        {/* Level 0: Data Sources */}
-        <ArchNode title="Data Sources" subtitle="External feedback channels" color="bg-blue-500" />
-        <Connector />
-        <div className="flex gap-4">
-          <ArchNode title="App Store Reviews" subtitle="Google Play / iOS" color="bg-blue-400" small />
-          <ArchNode title="Reddit Posts" subtitle="r/myntra & fashion" color="bg-blue-400" small />
-          <ArchNode title="YouTube Comments" subtitle="Fashion reviews" color="bg-blue-400" small />
-          <ArchNode title="Twitter/X" subtitle="Brand mentions" color="bg-blue-400" small />
-        </div>
+      <div className="overflow-x-auto pb-4">
+        <div className="flex items-stretch gap-0 min-w-max">
+          {/* Level 0: Data Sources */}
+          <Level title="Data Sources" subtitle="External feedback channels" color="bg-blue-500">
+            <ArchNode title="App Store Reviews" subtitle="Google Play / iOS" color="bg-blue-400" small />
+            <ArchNode title="Reddit Posts" subtitle="r/myntra & fashion" color="bg-blue-400" small />
+            <ArchNode title="YouTube Comments" subtitle="Fashion reviews" color="bg-blue-400" small />
+            <ArchNode title="Twitter/X" subtitle="Brand mentions" color="bg-blue-400" small />
+          </Level>
 
-        <Connector />
-        {/* Level 1: Data Ingestion */}
-        <ArchNode title="Data Ingestion Service" subtitle="Python · FastAPI · Port 8001" color="bg-indigo-500" />
-        <div className="flex gap-8">
-          <div className="flex flex-col items-center">
-            <Connector />
-            <ArchNode title="API Collectors" subtitle="Reddit, YouTube, App Store APIs" color="bg-indigo-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
+          <HConnector />
+
+          {/* Level 1: Data Ingestion */}
+          <Level title="Data Ingestion" subtitle="Python · FastAPI · :8001" color="bg-indigo-500">
+            <ArchNode title="API Collectors" subtitle="Reddit, YouTube, App Store" color="bg-indigo-400" small />
             <ArchNode title="Webhook Receivers" subtitle="Real-time ingestion" color="bg-indigo-400" small />
-          </div>
-        </div>
+          </Level>
 
-        <Connector />
-        {/* Level 2: Storage */}
-        <div className="flex gap-4">
-          <ArchNode title="MongoDB" subtitle="Raw conversations" color="bg-green-500" />
-          <ArchNode title="PostgreSQL" subtitle="User segments" color="bg-green-500" />
-          <ArchNode title="Elasticsearch" subtitle="Snippet search" color="bg-green-500" />
-          <ArchNode title="Redis" subtitle="Cache layer" color="bg-green-500" />
-        </div>
+          <HConnector />
 
-        <Connector />
-        {/* Level 3: NLP Service */}
-        <ArchNode title="NLP Service" subtitle="Python · spaCy · Port 8002" color="bg-purple-500" />
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center">
-            <Connector />
+          {/* Level 2: Storage */}
+          <Level title="Storage" subtitle="Data persistence layer" color="bg-green-500">
+            <ArchNode title="MongoDB" subtitle="Raw conversations" color="bg-green-500" small />
+            <ArchNode title="PostgreSQL" subtitle="User segments" color="bg-green-500" small />
+            <ArchNode title="Elasticsearch" subtitle="Snippet search" color="bg-green-500" small />
+            <ArchNode title="Redis" subtitle="Cache layer" color="bg-green-500" small />
+          </Level>
+
+          <HConnector />
+
+          {/* Level 3: NLP Service */}
+          <Level title="NLP Service" subtitle="Python · spaCy · :8002" color="bg-purple-500">
             <ArchNode title="Sentiment Analysis" subtitle="VADER / Transformer" color="bg-purple-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Intent Classification" subtitle="Buy / Browse / Compare" color="bg-purple-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Entity Extraction" subtitle="NER + product tags" color="bg-purple-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Hesitation Driver" subtitle="Friction categorization" color="bg-purple-400" small />
-          </div>
-        </div>
+          </Level>
 
-        <Connector />
-        {/* Level 4: Analytics Service */}
-        <ArchNode title="Analytics Service" subtitle="Python · FastAPI · Port 8000" color="bg-orange-500" />
-        <div className="flex flex-wrap justify-center gap-4">
-          <div className="flex flex-col items-center">
-            <Connector />
+          <HConnector />
+
+          {/* Level 4: Analytics Service */}
+          <Level title="Analytics Service" subtitle="Python · FastAPI · :8000" color="bg-orange-500">
             <ArchNode title="KPI Calculator" subtitle="Metrics aggregation" color="bg-orange-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Friction Analyzer" subtitle="Breakdown & trends" color="bg-orange-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Intent Analyzer" subtitle="Intent matrix" color="bg-orange-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Journey Analyzer" subtitle="Funnel tracking" color="bg-orange-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Opportunity Analyzer" subtitle="Priority matrix" color="bg-orange-400" small />
-          </div>
-        </div>
+          </Level>
 
-        <Connector />
-        {/* Level 5: API Gateway */}
-        <ArchNode title="API Gateway" subtitle="Node.js · Express · Zod · Port 3000" color="bg-red-500" />
-        <div className="flex gap-4">
-          <div className="flex flex-col items-center">
-            <Connector />
+          <HConnector />
+
+          {/* Level 5: API Gateway */}
+          <Level title="API Gateway" subtitle="Node.js · Express · Zod · :3000" color="bg-red-500">
             <ArchNode title="Route Proxying" subtitle="Service orchestration" color="bg-red-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Redis Cache" subtitle="Response caching" color="bg-red-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Zod Validation" subtitle="Schema enforcement" color="bg-red-400" small />
-          </div>
-        </div>
+          </Level>
 
-        <Connector />
-        {/* Level 6: Frontend */}
-        <ArchNode title="Frontend (Next.js 14)" subtitle="React · TypeScript · Tailwind · Port 3001" color="bg-pink-500" />
-        <div className="flex flex-wrap justify-center gap-3">
-          <div className="flex flex-col items-center">
-            <Connector />
+          <HConnector />
+
+          {/* Level 6: Frontend */}
+          <Level title="Frontend (Next.js 14)" subtitle="React · TS · Tailwind · :3001" color="bg-pink-500">
             <ArchNode title="Dashboard" subtitle="Main analytics view" color="bg-pink-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="KPI Cards" subtitle="Live metrics" color="bg-pink-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Charts" subtitle="Recharts visualizations" color="bg-pink-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="ChatBot" subtitle="Q&A assistant" color="bg-pink-400" small />
-          </div>
-          <div className="flex flex-col items-center">
-            <Connector />
             <ArchNode title="Snippet Carousel" subtitle="Feedback browser" color="bg-pink-400" small />
-          </div>
-        </div>
+          </Level>
 
-        <Connector />
-        {/* Level 7: State Management */}
-        <div className="flex gap-4">
-          <ArchNode title="Zustand Store" subtitle="Filters & tab state" color="bg-teal-500" small />
-          <ArchNode title="React Query" subtitle="Data fetching & cache" color="bg-teal-500" small />
-          <ArchNode title="Axios" subtitle="API client (/api proxy)" color="bg-teal-500" small />
+          <HConnector />
+
+          {/* Level 7: State Management */}
+          <Level title="State Management" subtitle="Client-side state" color="bg-teal-500">
+            <ArchNode title="Zustand Store" subtitle="Filters & tab state" color="bg-teal-500" small />
+            <ArchNode title="React Query" subtitle="Data fetching & cache" color="bg-teal-500" small />
+            <ArchNode title="Axios" subtitle="API client (/api proxy)" color="bg-teal-500" small />
+          </Level>
         </div>
       </div>
 
@@ -161,8 +106,25 @@ function ArchNode({ title, subtitle, color, small }: { title: string; subtitle: 
   );
 }
 
-function Connector() {
-  return <div className="my-2 h-6 w-0.5 bg-gray-300" />;
+function Level({ title, subtitle, color, children }: { title: string; subtitle: string; color: string; children: React.ReactNode }) {
+  return (
+    <div className="flex w-48 flex-col items-center gap-3">
+      <div className={`w-full rounded-lg ${color} px-4 py-3 text-center text-white shadow-lg`}>
+        <div className="text-sm font-bold">{title}</div>
+        <div className="text-[10px] opacity-90">{subtitle}</div>
+      </div>
+      <div className="flex w-full flex-col items-center gap-2">{children}</div>
+    </div>
+  );
+}
+
+function HConnector() {
+  return (
+    <div className="flex items-center pt-12">
+      <div className="h-0.5 w-6 bg-gray-300" />
+      <div className="h-0 w-0 border-y-4 border-l-6 border-y-transparent border-l-gray-400" />
+    </div>
+  );
 }
 
 function StackCard({ title, items }: { title: string; items: string[] }) {
