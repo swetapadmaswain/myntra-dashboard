@@ -104,7 +104,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
   return (
     <div className="space-y-6">
       {/* 1) User Satisfaction vs Exploration */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">User Satisfaction vs Exploration</h3>
         <p className="mb-5 text-sm text-myntra-text-light">Bubble size = total signals. <span className="font-semibold text-green-600">Top-right</span> = high satisfaction &amp; high exploration. <span className="font-semibold text-red-500">Bottom-left</span> = low engagement.</p>
         <div className="h-96">
@@ -138,7 +138,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
       </div>
 
       {/* 4) Frustration Frequency Analysis */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">Frustration Frequency Analysis</h3>
         <p className="mb-5 text-sm text-myntra-text-light"><span className="font-semibold text-myntra-pink">Bars</span> = frequency count. <span className="font-semibold text-blue-500">Line</span> = cumulative percentage (Pareto chart). Focus on items before the line flattens.</p>
         <div className="h-96">
@@ -160,7 +160,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
       </div>
 
       {/* 6) Key Barriers Insight */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">Key Barriers Insight</h3>
         <p className="mb-5 text-sm text-myntra-text-light">Top friction points ranked by impact. Each card shows severity, share of total friction, and a recommended action.</p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -187,7 +187,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
       </div>
 
       {/* 7) Product Opportunity Matrix */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">Product Opportunity Matrix</h3>
         <p className="mb-5 text-sm text-myntra-text-light">X = Effort (0=easy, 10=hard). Y = Lift/Impact (0=low, 10=high). Bubble size = estimated impact. Colors indicate priority quadrant.</p>
         <div className="h-96">
@@ -221,7 +221,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
       </div>
 
       {/* 8) Sentiment-Impact Quadrant */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">Sentiment-Impact Quadrant</h3>
         <p className="mb-5 text-sm text-myntra-text-light">X = Sentiment % (left=negative, right=positive). Y = Impact Score. <span className="font-semibold text-red-500">Top-left</span> = negative &amp; high-impact (urgent). <span className="font-semibold text-green-600">Bottom-right</span> = positive &amp; low-impact (maintain).</p>
         <div className="h-96">
@@ -256,7 +256,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
       </div>
 
       {/* 11) Discovery by Category & Time */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">Discovery by Category & Time</h3>
         <p className="mb-5 text-sm text-myntra-text-light">Discovery events per friction category across 4 weekly time slots. Higher = more users discovering issues in that category.</p>
         <div className="h-96">
@@ -276,7 +276,7 @@ export function InsightsPanel({ metrics, frictionData, opportunityData }: Insigh
       </div>
 
       {/* 12) Feedback Intensity by Category & Time */}
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-6 shadow-sm">
         <h3 className="mb-1 text-xl font-bold text-myntra-text-dark">Feedback Intensity by Category & Time</h3>
         <p className="mb-5 text-sm text-myntra-text-light">Heatmap of feedback volume per category per week. Darker = more feedback intensity.</p>
         <div className="overflow-x-auto">

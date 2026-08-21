@@ -60,7 +60,7 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
   return (
     <div className="space-y-6">
       {/* User Segment Distribution */}
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-4 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-myntra-text-dark">User Segment Distribution</h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="h-72">
@@ -88,7 +88,7 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
       </div>
 
       {/* Segment Characteristics */}
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-4 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-myntra-text-dark">Segment Characteristics</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -117,7 +117,7 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
       </div>
 
       {/* Behavioral Patterns by Segment */}
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-4 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-myntra-text-dark">Behavioral Patterns by Segment</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
@@ -138,7 +138,7 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
       </div>
 
       {/* User Segment Impact */}
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-4 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-myntra-text-dark">User Segment Impact</h3>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
@@ -156,7 +156,7 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
       </div>
 
       {/* Segment × Frustration Crosstab */}
-      <div className="rounded-xl bg-white p-4 shadow-sm">
+      <div className="rounded-xl border-t-4 border-myntra-pink bg-white p-4 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-myntra-text-dark">Segment × Frustration Crosstab</h3>
         <div className="overflow-x-auto">
           <table className="w-full">

@@ -43,12 +43,19 @@ export function KPICards({ metrics }: KPICardsProps) {
     { label: 'Top Intent', value: topIntent, sub: 'Dominant buyer intent' },
   ];
 
+  const cardStyles = [
+    { color: '#ff3f6c' },
+    { color: '#3b82f6' },
+    { color: '#10b981' },
+    { color: '#f59e0b' },
+  ];
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => (
-        <div key={card.label} className="rounded-xl bg-white p-5 shadow-sm">
+      {cards.map((card, i) => (
+        <div key={card.label} className="rounded-xl border-t-4 bg-white p-5 shadow-sm" style={{ borderTopColor: cardStyles[i].color }}>
           <p className="text-sm text-myntra-text-light">{card.label}</p>
-          <p className="mt-1 text-2xl font-semibold text-myntra-text-dark">{card.value}</p>
+          <p className="mt-1 text-2xl font-semibold" style={{ color: cardStyles[i].color }}>{card.value}</p>
           <p className="mt-1 text-xs text-myntra-text-light">{card.sub}</p>
         </div>
       ))}
