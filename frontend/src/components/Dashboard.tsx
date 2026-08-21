@@ -6,6 +6,7 @@ import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
 import { SnippetCarousel } from './SnippetCarousel';
 import { DiscoveryPanel } from './DiscoveryPanel';
+import { ChatBot } from './ChatBot';
 import { FrictionBarChart } from './FrictionBarChart';
 import { IntentRadarChart } from './IntentRadarChart';
 import { JourneyFlowChart } from './JourneyFlowChart';
@@ -159,6 +160,8 @@ export function Dashboard() {
           )}
         </div>
       </main>
+
+      <ChatBot metrics={metrics} />
     </div>
   );
 }
