@@ -130,9 +130,9 @@ export function ChatBot({ metrics }: ChatBotProps) {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start">
+    <div className="fixed top-6 right-6 z-50 flex flex-col items-end">
       {open && (
-        <div className="mb-3 flex w-[360px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-myntra-gray-2 bg-white shadow-2xl">
+        <div className="mb-3 flex w-[400px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-myntra-gray-2 bg-white shadow-2xl">
           <div className="flex items-center justify-between bg-myntra-pink px-4 py-3">
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-myntra-pink">
@@ -203,12 +203,12 @@ export function ChatBot({ metrics }: ChatBotProps) {
                       setSelected('');
                     }
                   }}
-                  className="w-full truncate rounded-lg border border-myntra-gray-2 bg-white px-3 py-2 text-xs text-myntra-text-dark outline-none focus:border-myntra-pink"
+                  className="w-full rounded-lg border border-myntra-gray-2 bg-white px-3 py-2 text-xs text-myntra-text-dark outline-none focus:border-myntra-pink"
                 >
                   <option value="">Select a question…</option>
                   {QUESTIONS.map((q) => (
                     <option key={q} value={q}>
-                      {q.length > 60 ? `${q.slice(0, 60)}…` : q}
+                      {q}
                     </option>
                   ))}
                 </select>
