@@ -7,22 +7,40 @@ interface KPICardsProps {
     primary_hesitation_percentage?: number;
     sentiment_distribution?: Record<string, number>;
     intent_distribution?: Record<string, number>;
+    hesitation_distribution?: Record<string, number>;
   };
+}
+
+function titleCase(value: string) {
+  return value.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
 export function KPICards({ metrics }: KPICardsProps) {
   const totalSentiment = Object.values(metrics.sentiment_distribution || {}).reduce((a, b) => a + b, 0);
-  const neutral = metrics.sentiment_distribution?.neutral || 0;
-  const neutralPct = totalSentiment ? ((neutral / totalSentiment) * 100).toFixed(1) : '0';
-  const driver = metrics.primary_hesitation_driver
-    ? `${metrics.primary_hesitation_driver} (${metrics.primary_hesitation_percentage?.toFixed(1)}%)`
+  const positive = metrics.sentiment_distribution?.positive || 0;
+  const negative = metrics.sentiment_distribution?.negative || 0;
+  const avgSentiment = totalSentiment
+    ? (((positive - negative) / totalSentiment) * 100).toFixed(1)
+    : '0.0';
+
+  const topFriction = metrics.primary_hesitation_driver
+    ? `${titleCase(metrics.primary_hesitation_driver)} (${metrics.primary_hesitation_percentage?.toFixed(1)}%)`
+    : '—';
+
+  const intents = metrics.intent_distribution || {};
+  const totalIntent = Object.values(intents).reduce((a, b) => a + b, 0);
+  const topIntentEntry = totalIntent
+    ? Object.entries(intents).sort((a, b) => b[1] - a[1])[0]
+    : null;
+  const topIntent = topIntentEntry
+    ? `${titleCase(topIntentEntry[0])} (${((topIntentEntry[1] / totalIntent) * 100).toFixed(1)}%)`
     : '—';
 
   const cards = [
-    { label: 'Total Signals', value: metrics.total_signals ?? 0, sub: 'Processed snippets' },
-    { label: 'Wishlist Intent', value: `${(metrics.bookmarking_intent ?? 0).toFixed(1)}%`, sub: 'Bookmarking users' },
-    { label: 'Top Hesitation', value: driver, sub: 'Why people hold back' },
-    { label: 'Neutral Sentiment', value: `${neutralPct}%`, sub: `${neutral} mentions` },
+    { label: 'Total Snippets', value: metrics.total_signals ?? 0, sub: 'Analyzed conversations' },
+    { label: 'Avg Sentiment', value: avgSentiment, sub: 'Net sentiment score' },
+    { label: 'Top Friction', value: topFriction, sub: 'Why people hold back' },
+    { label: 'Top Intent', value: topIntent, sub: 'Dominant buyer intent' },
   ];
 
   return (

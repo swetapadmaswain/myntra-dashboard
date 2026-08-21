@@ -14,11 +14,22 @@ export interface Snippet {
 }
 
 export interface KPIMetrics {
-  total_snippets: number;
-  avg_sentiment_score: number;
-  top_friction_driver: string;
-  top_intent: string;
-  snippet_growth_rate: number;
+  total_signals: number;
+  bookmarking_intent: number;
+  immediate_purchase_intent: number;
+  primary_hesitation_driver: string;
+  primary_hesitation_percentage: number;
+  information_leakage: number;
+  sentiment_distribution: Record<string, number>;
+  intent_distribution: Record<string, number>;
+  hesitation_distribution: Record<string, number>;
+  calculated_at: string;
+}
+
+export interface FrictionItem {
+  name: string;
+  count: number;
+  percentage: number;
 }
 
 export interface FilterState {
@@ -30,4 +41,4 @@ export interface FilterState {
   limit: number;
 }
 
-export type TabKey = 'friction' | 'intent' | 'journey' | 'opportunity';
+export type TabKey = 'friction' | 'intent' | 'journey' | 'opportunity' | 'discovery';

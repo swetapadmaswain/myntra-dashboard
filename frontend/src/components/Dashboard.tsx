@@ -5,13 +5,19 @@ import { useQuery } from '@tanstack/react-query';
 import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
 import { SnippetList } from './SnippetList';
+import { DiscoveryPanel } from './DiscoveryPanel';
 import { FrictionBarChart } from './FrictionBarChart';
 import { IntentRadarChart } from './IntentRadarChart';
 import { JourneyFlowChart } from './JourneyFlowChart';
 import { OpportunityScatterPlot } from './OpportunityScatterPlot';
 import { fetchMetrics, fetchSnippets } from '@/services/api';
 import { useDashboardStore } from '@/store/dashboardStore';
-import { frictionMock, intentMock, journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
+import { KPIMetrics } from '@/types';
+import { journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
+
+function titleCase(value: string) {
+  return value.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+}
 
 export function Dashboard() {
   const [mounted, setMounted] = useState(false);
@@ -35,6 +41,20 @@ export function Dashboard() {
       }),
   });
 
+  const typedMetrics = (metrics as KPIMetrics) || {};
+
+  const frictionData = Object.entries(typedMetrics.hesitation_distribution || {}).map(([name, count]) => ({
+    name: titleCase(name),
+    count,
+  }));
+
+  const maxIntent = Math.max(...Object.values(typedMetrics.intent_distribution || {}), 1);
+  const intentData = Object.entries(typedMetrics.intent_distribution || {}).map(([subject, a]) => ({
+    subject: titleCase(subject),
+    A: a,
+    fullMark: maxIntent,
+  }));
+
   if (!mounted) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-myntra-gray">
@@ -57,6 +77,12 @@ export function Dashboard() {
       ) : (
         <div className="mb-6">
           <KPICards metrics={metrics || {}} />
+        </div>
+      )}
+
+      {metricsError && (
+        <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700 shadow-sm">
+          Failed to load KPIs. Check the API Gateway and browser console.
         </div>
       )}
 
@@ -115,10 +141,11 @@ export function Dashboard() {
               {tab === 'journey' && 'Journey Tracker'}
               {tab === 'opportunity' && 'Opportunity Matrix'}
             </h2>
-            {tab === 'friction' && <FrictionBarChart data={frictionMock} />}
-            {tab === 'intent' && <IntentRadarChart data={intentMock} />}
+            {tab === 'friction' && <FrictionBarChart data={frictionData} />}
+            {tab === 'intent' && <IntentRadarChart data={intentData} />}
             {tab === 'journey' && <JourneyFlowChart data={journeyMock} />}
             {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityMock} />}
+            {tab === 'discovery' && <DiscoveryPanel metrics={metrics} />}
           </div>
         </div>
 
