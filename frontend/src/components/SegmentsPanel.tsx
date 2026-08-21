@@ -159,25 +159,29 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
       <div className="rounded-xl bg-white p-4 shadow-sm">
         <h3 className="mb-4 text-lg font-semibold text-myntra-text-dark">Segment × Frustration Crosstab</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full">
             <thead>
-              <tr className="border-b border-myntra-gray text-left text-myntra-text-light">
-                <th className="pb-2 pr-4 font-medium">Segment</th>
+              <tr className="border-b-2 border-gray-200">
+                <th className="pb-3 pr-4 text-left text-sm font-semibold text-myntra-text-dark">Segment</th>
                 {frustrationTypes.map((f) => (
-                  <th key={f} className="pb-2 pr-4 text-center font-medium">{f}</th>
+                  <th key={f} className="pb-3 px-2 text-center text-sm font-semibold text-myntra-text-dark">{f}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {crosstabSegments.map((seg) => (
-                <tr key={seg} className="border-b border-myntra-gray/50 last:border-0">
-                  <td className="py-2 pr-4 font-medium text-myntra-text-dark">{seg}</td>
+                <tr key={seg} className="border-b border-gray-100 last:border-0">
+                  <td className="py-3 pr-4 text-sm font-semibold text-myntra-text-dark">{seg}</td>
                   {crosstabData[seg].map((val, i) => {
                     const intensity = val / 100;
-                    const bg = `rgba(255, 63, 108, ${intensity * 0.8})`;
+                    const bg = `rgba(255, 63, 108, ${Math.max(intensity * 0.85, 0.12)})`;
+                    const textColor = intensity > 0.45 ? '#ffffff' : '#1f2937';
                     return (
-                      <td key={i} className="py-2 pr-4 text-center">
-                        <div className="mx-auto flex h-10 w-16 items-center justify-center rounded-md font-medium text-white" style={{ backgroundColor: bg }}>
+                      <td key={i} className="py-2 px-2 text-center">
+                        <div
+                          className="mx-auto flex h-14 w-20 items-center justify-center rounded-lg text-base font-bold shadow-sm"
+                          style={{ backgroundColor: bg, color: textColor }}
+                        >
                           {val}
                         </div>
                       </td>
@@ -188,7 +192,7 @@ export function SegmentsPanel({ metrics }: SegmentsPanelProps) {
             </tbody>
           </table>
         </div>
-        <p className="mt-3 text-xs text-myntra-text-light">Values represent frustration frequency score (0-100). Darker = higher frustration.</p>
+        <p className="mt-3 text-sm text-myntra-text-light">Values represent frustration frequency score (0-100). Darker = higher frustration.</p>
       </div>
     </div>
   );
