@@ -8,6 +8,8 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+ARG API_GATEWAY_URL=http://api-gateway:3000/api/v1
+ENV API_GATEWAY_URL=$API_GATEWAY_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

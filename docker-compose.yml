@@ -236,21 +236,20 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        API_GATEWAY_URL: http://api-gateway:3000/api/v1
     container_name: myntra-frontend
     ports:
       - "3001:3000"
     environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3000/api/v1
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: /api
+      API_GATEWAY_URL: http://api-gateway:3000/api/v1
       NEXT_PUBLIC_WS_URL: ws://localhost:3000
     depends_on:
       - api-gateway
     networks:
       - myntra-network
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
 
 networks:
   myntra-network:
