@@ -6,6 +6,9 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: 'journey', label: 'Journey Tracker' },
   { key: 'opportunity', label: 'Opportunity Matrix' },
   { key: 'discovery', label: 'Discovery Engine' },
+  { key: 'segments', label: 'Segments' },
+  { key: 'insights', label: 'Insights' },
+  { key: 'architecture', label: 'Architecture' },
 ];
 
 interface TabNavigationProps {

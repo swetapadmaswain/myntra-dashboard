@@ -11,6 +11,9 @@ import { FrictionBarChart } from './FrictionBarChart';
 import { IntentRadarChart } from './IntentRadarChart';
 import { JourneyFlowChart } from './JourneyFlowChart';
 import { OpportunityScatterPlot } from './OpportunityScatterPlot';
+import { SegmentsPanel } from './SegmentsPanel';
+import { InsightsPanel } from './InsightsPanel';
+import { ArchitectureDiagram } from './ArchitectureDiagram';
 import { fetchMetrics, fetchSnippets, fetchFriction, fetchIntentMatrix, fetchJourney, fetchOpportunities } from '@/services/api';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { KPIMetrics } from '@/types';
@@ -195,6 +198,17 @@ export function Dashboard() {
 
       <TabNavigation active={tab} onChange={setTab} />
 
+      {/* Full-width tabs: segments, insights, architecture */}
+      {(tab === 'segments' || tab === 'insights' || tab === 'architecture') && (
+        <main className="mt-6">
+          {tab === 'segments' && <SegmentsPanel metrics={typedMetrics} />}
+          {tab === 'insights' && <InsightsPanel metrics={typedMetrics} frictionData={frictionData} opportunityData={opportunityData} />}
+          {tab === 'architecture' && <ArchitectureDiagram />}
+        </main>
+      )}
+
+      {/* Standard 2/3 + 1/3 layout tabs */}
+      {tab !== 'segments' && tab !== 'insights' && tab !== 'architecture' && (
       <main className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="rounded-xl bg-white p-4 shadow-sm">
@@ -222,6 +236,7 @@ export function Dashboard() {
           )}
         </div>
       </main>
+      )}
 
       <ChatBot metrics={metrics} />
     </div>
