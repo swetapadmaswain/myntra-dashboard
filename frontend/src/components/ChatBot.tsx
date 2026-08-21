@@ -99,6 +99,7 @@ export function ChatBot({ metrics }: ChatBotProps) {
     },
   ]);
   const [input, setInput] = useState('');
+  const [selected, setSelected] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -129,9 +130,9 @@ export function ChatBot({ metrics }: ChatBotProps) {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start">
       {open && (
-        <div className="mb-3 flex w-[360px] flex-col overflow-hidden rounded-2xl border border-myntra-gray-2 bg-white shadow-2xl">
+        <div className="mb-3 flex w-[360px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-myntra-gray-2 bg-white shadow-2xl">
           <div className="flex items-center justify-between bg-myntra-pink px-4 py-3">
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-myntra-pink">
@@ -189,18 +190,28 @@ export function ChatBot({ metrics }: ChatBotProps) {
             </div>
 
             <div className="border-t border-myntra-gray p-3">
-              <div className="mb-2 flex flex-wrap gap-1.5">
-                {QUESTIONS.slice(0, 4).map((q) => (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => send(q)}
-                    className="max-w-full truncate rounded-full border border-myntra-gray-2 bg-white px-2.5 py-1 text-[10px] text-myntra-text-dark transition hover:bg-myntra-gray"
-                    title={q}
-                  >
-                    {q.length > 32 ? `${q.slice(0, 32)}…` : q}
-                  </button>
-                ))}
+              <div className="mb-2">
+                <label className="mb-1 block text-[10px] font-medium uppercase tracking-wide text-myntra-text-light">
+                  Choose a question
+                </label>
+                <select
+                  value={selected}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value) {
+                      send(value);
+                      setSelected('');
+                    }
+                  }}
+                  className="w-full truncate rounded-lg border border-myntra-gray-2 bg-white px-3 py-2 text-xs text-myntra-text-dark outline-none focus:border-myntra-pink"
+                >
+                  <option value="">Select a question…</option>
+                  {QUESTIONS.map((q) => (
+                    <option key={q} value={q}>
+                      {q.length > 60 ? `${q.slice(0, 60)}…` : q}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="flex items-center gap-2">
                 <input
@@ -241,9 +252,10 @@ export function ChatBot({ metrics }: ChatBotProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-myntra-pink text-white shadow-lg transition hover:scale-105 hover:bg-myntra-pink-dark"
+        className="flex h-12 items-center gap-2 rounded-full bg-myntra-pink px-4 text-white shadow-xl transition hover:scale-105 hover:bg-myntra-pink-dark"
         aria-label={open ? 'Close chat' : 'Open chat'}
       >
+        <span className="text-sm font-semibold">Ask AI</span>
         {open ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
