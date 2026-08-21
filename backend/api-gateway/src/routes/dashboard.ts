@@ -13,6 +13,9 @@ const router = Router();
 const dashboardQuerySchema = z.object({
   segment_id: z.coerce.number().optional(),
   time_range: z.enum(['7d', '30d', '90d']).optional().default('30d'),
+  source: z.string().optional(),
+  sentiment: z.string().optional(),
+  hesitation_driver: z.string().optional(),
 });
 
 function validateQuery(schema: z.ZodSchema) {
@@ -112,7 +115,12 @@ router.get(
  */
 router.get(
   '/opportunity-matrix',
-  validateQuery(z.object({ time_range: z.enum(['7d', '30d', '90d']).optional().default('30d') })),
+  validateQuery(z.object({
+    time_range: z.enum(['7d', '30d', '90d']).optional().default('30d'),
+    source: z.string().optional(),
+    sentiment: z.string().optional(),
+    hesitation_driver: z.string().optional(),
+  })),
   cacheMiddleware(),
   async (req: Request, res: Response, next: NextFunction) => {
     try {

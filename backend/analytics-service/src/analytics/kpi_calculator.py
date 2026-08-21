@@ -27,7 +27,10 @@ class KPICalculator:
     def calculate_kpi_metrics(
         self,
         segment_id: Optional[int] = None,
-        time_range: str = "30d"
+        time_range: str = "30d",
+        source: Optional[str] = None,
+        sentiment: Optional[str] = None,
+        hesitation_driver: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Calculate KPI metrics for a segment and time range
@@ -35,12 +38,15 @@ class KPICalculator:
         Args:
             segment_id: User segment ID (None for all segments)
             time_range: Time range (7d, 30d, 90d)
+            source: Data source filter (appstore, youtube, reddit)
+            sentiment: Sentiment filter (positive, neutral, negative)
+            hesitation_driver: Hesitation driver filter
             
         Returns:
             Dictionary with KPI metrics
         """
         # Check cache first
-        cache_key = f"kpi_metrics:segment_{segment_id}:time_{time_range}"
+        cache_key = f"kpi_metrics:segment_{segment_id}:time_{time_range}:source_{source}:sent_{sentiment}:hes_{hesitation_driver}"
         cached_result = redis_client.get(cache_key)
         
         if cached_result:
@@ -56,6 +62,12 @@ class KPICalculator:
             query = self._build_time_query(start_date, end_date)
             if segment_id:
                 query['metadata.segment_id'] = segment_id
+            if source:
+                query['source'] = source
+            if sentiment:
+                query['sentiment'] = sentiment
+            if hesitation_driver:
+                query['hesitation_driver'] = hesitation_driver
             
             conversations = mongodb_client.find(
                 'raw_conversations',

@@ -32,22 +32,42 @@ export async function searchSnippets(body: {
   return (await api.post('/snippets/search', body)).data;
 }
 
-export async function fetchMetrics(): Promise<any> {
-  return (await api.get('/dashboard/metrics')).data;
+export async function fetchMetrics(filters?: {
+  source?: string | null;
+  sentiment?: string | null;
+  hesitation_driver?: string | null;
+}): Promise<any> {
+  return (await api.get('/dashboard/metrics', { params: filters })).data;
 }
 
-export async function fetchFriction(): Promise<any> {
-  return (await api.get('/dashboard/friction-breakdown')).data;
+export async function fetchFriction(filters?: {
+  source?: string | null;
+  sentiment?: string | null;
+  hesitation_driver?: string | null;
+}): Promise<any> {
+  return (await api.get('/dashboard/friction-breakdown', { params: filters })).data;
 }
 
-export async function fetchIntentMatrix(): Promise<any> {
-  return (await api.get('/dashboard/intent-matrix')).data;
+export async function fetchIntentMatrix(filters?: {
+  source?: string | null;
+  sentiment?: string | null;
+  hesitation_driver?: string | null;
+}): Promise<any> {
+  return (await api.get('/dashboard/intent-matrix', { params: filters })).data;
 }
 
-export async function fetchJourney(): Promise<any> {
-  return (await api.get('/dashboard/journey-tracker')).data;
+export async function fetchJourney(filters?: {
+  source?: string | null;
+  sentiment?: string | null;
+  hesitation_driver?: string | null;
+}): Promise<any> {
+  return (await api.get('/dashboard/journey-tracker', { params: filters })).data;
 }
 
-export async function fetchOpportunities(): Promise<any> {
-  return (await api.get('/dashboard/opportunity-matrix')).data;
+export async function fetchOpportunities(filters?: {
+  source?: string | null;
+  sentiment?: string | null;
+  hesitation_driver?: string | null;
+}): Promise<any> {
+  return (await api.get('/dashboard/opportunity-matrix', { params: filters })).data;
 }

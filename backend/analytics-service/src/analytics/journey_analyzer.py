@@ -38,7 +38,10 @@ class JourneyAnalyzer:
     def calculate_journey_tracker(
         self,
         segment_id: Optional[int] = None,
-        time_range: str = "30d"
+        time_range: str = "30d",
+        source: Optional[str] = None,
+        sentiment: Optional[str] = None,
+        hesitation_driver: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Calculate journey tracker for a segment and time range
@@ -46,12 +49,15 @@ class JourneyAnalyzer:
         Args:
             segment_id: User segment ID (None for all segments)
             time_range: Time range (7d, 30d, 90d)
+            source: Data source filter
+            sentiment: Sentiment filter
+            hesitation_driver: Hesitation driver filter
             
         Returns:
             Dictionary with journey tracker data
         """
         # Check cache first
-        cache_key = f"journey_tracker:segment_{segment_id}:time_{time_range}"
+        cache_key = f"journey_tracker:segment_{segment_id}:time_{time_range}:source_{source}:sent_{sentiment}:hes_{hesitation_driver}"
         cached_result = redis_client.get(cache_key)
         
         if cached_result:
@@ -67,6 +73,12 @@ class JourneyAnalyzer:
             query = self._build_time_query(start_date, end_date)
             if segment_id:
                 query['metadata.segment_id'] = segment_id
+            if source:
+                query['source'] = source
+            if sentiment:
+                query['sentiment'] = sentiment
+            if hesitation_driver:
+                query['hesitation_driver'] = hesitation_driver
             
             events = mongodb_client.find(
                 'user_journey_events',

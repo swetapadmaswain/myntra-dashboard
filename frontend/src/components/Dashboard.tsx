@@ -11,7 +11,7 @@ import { FrictionBarChart } from './FrictionBarChart';
 import { IntentRadarChart } from './IntentRadarChart';
 import { JourneyFlowChart } from './JourneyFlowChart';
 import { OpportunityScatterPlot } from './OpportunityScatterPlot';
-import { fetchMetrics, fetchSnippets } from '@/services/api';
+import { fetchMetrics, fetchSnippets, fetchFriction, fetchIntentMatrix, fetchJourney, fetchOpportunities } from '@/services/api';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { KPIMetrics } from '@/types';
 import { journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
@@ -26,9 +26,15 @@ export function Dashboard() {
 
   const { tab, setTab, filters, setFilter, resetFilters } = useDashboardStore();
 
+  const filterParams = {
+    source: filters.source,
+    sentiment: filters.sentiment,
+    hesitation_driver: filters.hesitation_driver,
+  };
+
   const { data: metrics, isLoading: metricsLoading, isError: metricsError } = useQuery({
-    queryKey: ['metrics'],
-    queryFn: fetchMetrics,
+    queryKey: ['metrics', filterParams],
+    queryFn: () => fetchMetrics(filterParams),
   });
 
   const { data: snippetsData, isLoading: snippetsLoading, isError: snippetsError } = useQuery({
@@ -42,19 +48,61 @@ export function Dashboard() {
       }),
   });
 
+  const { data: frictionResponse } = useQuery({
+    queryKey: ['friction', filterParams],
+    queryFn: () => fetchFriction(filterParams),
+    enabled: tab === 'friction',
+  });
+
+  const { data: intentResponse } = useQuery({
+    queryKey: ['intent', filterParams],
+    queryFn: () => fetchIntentMatrix(filterParams),
+    enabled: tab === 'intent',
+  });
+
+  const { data: journeyResponse } = useQuery({
+    queryKey: ['journey', filterParams],
+    queryFn: () => fetchJourney(filterParams),
+    enabled: tab === 'journey',
+  });
+
+  const { data: opportunityResponse } = useQuery({
+    queryKey: ['opportunity', filterParams],
+    queryFn: () => fetchOpportunities(filterParams),
+    enabled: tab === 'opportunity',
+  });
+
   const typedMetrics = (metrics as KPIMetrics) || {};
 
-  const frictionData = Object.entries(typedMetrics.hesitation_distribution || {}).map(([name, count]) => ({
-    name: titleCase(name),
-    count,
-  }));
+  // Build friction chart data from filtered friction API response, fall back to metrics
+  const frictionApiData = (frictionResponse as any)?.friction_types;
+  const frictionData = frictionApiData
+    ? frictionApiData.map((item: any) => ({
+        name: titleCase(item.name),
+        count: item.count,
+      }))
+    : Object.entries(typedMetrics.hesitation_distribution || {}).map(([name, count]) => ({
+        name: titleCase(name),
+        count,
+      }));
 
-  const maxIntent = Math.max(...Object.values(typedMetrics.intent_distribution || {}), 1);
-  const intentData = Object.entries(typedMetrics.intent_distribution || {}).map(([subject, a]) => ({
+  // Build intent chart data from filtered intent API response, fall back to metrics
+  const intentApiData = (intentResponse as any)?.intent_distribution;
+  const intentDist = intentApiData
+    ? Object.fromEntries(intentApiData.map((item: any) => [item.intent_type, item.count]))
+    : (typedMetrics.intent_distribution || {});
+  const maxIntent = Math.max(...Object.values(intentDist), 1);
+  const intentData = Object.entries(intentDist).map(([subject, a]) => ({
     subject: titleCase(subject),
     A: a,
     fullMark: maxIntent,
   }));
+
+  // Journey data from filtered API, fall back to mock
+  const journeyData = (journeyResponse as any)?.journey_data || journeyMock;
+
+  // Opportunity data from filtered API, fall back to mock
+  const opportunityData = (opportunityResponse as any)?.opportunities || opportunityMock;
 
   if (!mounted) {
     return (
@@ -144,8 +192,8 @@ export function Dashboard() {
             </h2>
             {tab === 'friction' && <FrictionBarChart data={frictionData} />}
             {tab === 'intent' && <IntentRadarChart data={intentData} />}
-            {tab === 'journey' && <JourneyFlowChart data={journeyMock} />}
-            {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityMock} />}
+            {tab === 'journey' && <JourneyFlowChart data={journeyData} />}
+            {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityData} />}
             {tab === 'discovery' && <DiscoveryPanel metrics={metrics} />}
           </div>
         </div>

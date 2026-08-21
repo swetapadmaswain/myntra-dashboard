@@ -33,19 +33,25 @@ class OpportunityAnalyzer:
     
     def calculate_opportunity_matrix(
         self,
-        time_range: str = "30d"
+        time_range: str = "30d",
+        source: Optional[str] = None,
+        sentiment: Optional[str] = None,
+        hesitation_driver: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Calculate opportunity matrix based on friction and impact analysis
         
         Args:
             time_range: Time range (7d, 30d, 90d)
+            source: Data source filter
+            sentiment: Sentiment filter
+            hesitation_driver: Hesitation driver filter
             
         Returns:
             Dictionary with opportunity matrix data
         """
         # Check cache first
-        cache_key = f"opportunity_matrix:time_{time_range}"
+        cache_key = f"opportunity_matrix:time_{time_range}:source_{source}:sent_{sentiment}:hes_{hesitation_driver}"
         cached_result = redis_client.get(cache_key)
         
         if cached_result:
@@ -57,14 +63,20 @@ class OpportunityAnalyzer:
             from .friction_analyzer import friction_analyzer
             friction_data = friction_analyzer.calculate_friction_breakdown(
                 segment_id=None,
-                time_range=time_range
+                time_range=time_range,
+                source=source,
+                sentiment=sentiment,
+                hesitation_driver=hesitation_driver
             )
             
             # Get KPI metrics
             from .kpi_calculator import kpi_calculator
             kpi_data = kpi_calculator.calculate_kpi_metrics(
                 segment_id=None,
-                time_range=time_range
+                time_range=time_range,
+                source=source,
+                sentiment=sentiment,
+                hesitation_driver=hesitation_driver
             )
             
             # Calculate opportunities

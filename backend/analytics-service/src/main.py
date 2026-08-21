@@ -111,22 +111,18 @@ async def get_segments() -> Dict[str, Any]:
 @app.get("/analytics/kpi-metrics")
 async def get_kpi_metrics(
     segment_id: Optional[int] = Query(None, description="User segment ID"),
-    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d")
+    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d"),
+    source: Optional[str] = Query(None, description="Data source filter"),
+    sentiment: Optional[str] = Query(None, description="Sentiment filter"),
+    hesitation_driver: Optional[str] = Query(None, description="Hesitation driver filter")
 ) -> Dict[str, Any]:
     """
     Get KPI metrics for a segment and time range
-    
-    Args:
-        segment_id: User segment ID (optional)
-        time_range: Time range (7d, 30d, 90d)
-        
-    Returns:
-        KPI metrics dictionary
     """
     try:
-        logger.info(f"Fetching KPI metrics: segment={segment_id}, time_range={time_range}")
+        logger.info(f"Fetching KPI metrics: segment={segment_id}, time_range={time_range}, source={source}, sentiment={sentiment}, hesitation_driver={hesitation_driver}")
         
-        metrics = kpi_calculator.calculate_kpi_metrics(segment_id, time_range)
+        metrics = kpi_calculator.calculate_kpi_metrics(segment_id, time_range, source, sentiment, hesitation_driver)
         
         return metrics
         
@@ -139,22 +135,18 @@ async def get_kpi_metrics(
 @app.get("/analytics/friction-breakdown")
 async def get_friction_breakdown(
     segment_id: Optional[int] = Query(None, description="User segment ID"),
-    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d")
+    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d"),
+    source: Optional[str] = Query(None, description="Data source filter"),
+    sentiment: Optional[str] = Query(None, description="Sentiment filter"),
+    hesitation_driver: Optional[str] = Query(None, description="Hesitation driver filter")
 ) -> Dict[str, Any]:
     """
     Get friction breakdown for a segment and time range
-    
-    Args:
-        segment_id: User segment ID (optional)
-        time_range: Time range (7d, 30d, 90d)
-        
-    Returns:
-        Friction breakdown dictionary
     """
     try:
-        logger.info(f"Fetching friction breakdown: segment={segment_id}, time_range={time_range}")
+        logger.info(f"Fetching friction breakdown: segment={segment_id}, time_range={time_range}, source={source}, sentiment={sentiment}, hesitation_driver={hesitation_driver}")
         
-        breakdown = friction_analyzer.calculate_friction_breakdown(segment_id, time_range)
+        breakdown = friction_analyzer.calculate_friction_breakdown(segment_id, time_range, source, sentiment, hesitation_driver)
         
         return breakdown
         
@@ -196,22 +188,18 @@ async def get_friction_trend(
 @app.get("/analytics/intent-matrix")
 async def get_intent_matrix(
     segment_id: Optional[int] = Query(None, description="User segment ID"),
-    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d")
+    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d"),
+    source: Optional[str] = Query(None, description="Data source filter"),
+    sentiment: Optional[str] = Query(None, description="Sentiment filter"),
+    hesitation_driver: Optional[str] = Query(None, description="Hesitation driver filter")
 ) -> Dict[str, Any]:
     """
     Get intent matrix for a segment and time range
-    
-    Args:
-        segment_id: User segment ID (optional)
-        time_range: Time range (7d, 30d, 90d)
-        
-    Returns:
-        Intent matrix dictionary
     """
     try:
-        logger.info(f"Fetching intent matrix: segment={segment_id}, time_range={time_range}")
+        logger.info(f"Fetching intent matrix: segment={segment_id}, time_range={time_range}, source={source}, sentiment={sentiment}, hesitation_driver={hesitation_driver}")
         
-        matrix = intent_analyzer.calculate_intent_matrix(segment_id, time_range)
+        matrix = intent_analyzer.calculate_intent_matrix(segment_id, time_range, source, sentiment, hesitation_driver)
         
         return matrix
         
@@ -224,22 +212,18 @@ async def get_intent_matrix(
 @app.get("/analytics/journey-tracker")
 async def get_journey_tracker(
     segment_id: Optional[int] = Query(None, description="User segment ID"),
-    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d")
+    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d"),
+    source: Optional[str] = Query(None, description="Data source filter"),
+    sentiment: Optional[str] = Query(None, description="Sentiment filter"),
+    hesitation_driver: Optional[str] = Query(None, description="Hesitation driver filter")
 ) -> Dict[str, Any]:
     """
     Get journey tracker for a segment and time range
-    
-    Args:
-        segment_id: User segment ID (optional)
-        time_range: Time range (7d, 30d, 90d)
-        
-    Returns:
-        Journey tracker dictionary
     """
     try:
-        logger.info(f"Fetching journey tracker: segment={segment_id}, time_range={time_range}")
+        logger.info(f"Fetching journey tracker: segment={segment_id}, time_range={time_range}, source={source}, sentiment={sentiment}, hesitation_driver={hesitation_driver}")
         
-        tracker = journey_analyzer.calculate_journey_tracker(segment_id, time_range)
+        tracker = journey_analyzer.calculate_journey_tracker(segment_id, time_range, source, sentiment, hesitation_driver)
         
         return tracker
         
@@ -251,21 +235,18 @@ async def get_journey_tracker(
 # Opportunity Matrix endpoint
 @app.get("/analytics/opportunity-matrix")
 async def get_opportunity_matrix(
-    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d")
+    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d"),
+    source: Optional[str] = Query(None, description="Data source filter"),
+    sentiment: Optional[str] = Query(None, description="Sentiment filter"),
+    hesitation_driver: Optional[str] = Query(None, description="Hesitation driver filter")
 ) -> Dict[str, Any]:
     """
     Get opportunity matrix for prioritization
-    
-    Args:
-        time_range: Time range (7d, 30d, 90d)
-        
-    Returns:
-        Opportunity matrix dictionary
     """
     try:
-        logger.info(f"Fetching opportunity matrix: time_range={time_range}")
+        logger.info(f"Fetching opportunity matrix: time_range={time_range}, source={source}, sentiment={sentiment}, hesitation_driver={hesitation_driver}")
         
-        matrix = opportunity_analyzer.calculate_opportunity_matrix(time_range)
+        matrix = opportunity_analyzer.calculate_opportunity_matrix(time_range, source, sentiment, hesitation_driver)
         
         return matrix
         
