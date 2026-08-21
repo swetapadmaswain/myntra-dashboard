@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
-import { SnippetList } from './SnippetList';
+import { SnippetCarousel } from './SnippetCarousel';
 import { DiscoveryPanel } from './DiscoveryPanel';
 import { FrictionBarChart } from './FrictionBarChart';
 import { IntentRadarChart } from './IntentRadarChart';
@@ -149,14 +149,13 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div>
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-myntra-text-light">
-            Recent Snippets
-          </h3>
+        <div className="lg:sticky lg:top-6 lg:self-start">
           {snippetsLoading ? (
-            <div className="rounded-xl bg-white p-8 text-center shadow-sm">Loading snippets...</div>
+            <div className="flex h-[420px] items-center justify-center rounded-xl bg-white p-8 text-center shadow-sm">
+              Loading snippets...
+            </div>
           ) : (
-            <SnippetList snippets={snippetsData?.snippets || snippetMock} />
+            <SnippetCarousel snippets={snippetsData?.snippets || snippetMock} />
           )}
         </div>
       </main>
