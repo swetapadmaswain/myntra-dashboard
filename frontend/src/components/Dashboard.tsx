@@ -98,11 +98,25 @@ export function Dashboard() {
     fullMark: maxIntent,
   }));
 
-  // Journey data from filtered API, fall back to mock
-  const journeyData = (journeyResponse as any)?.journey_data || journeyMock;
+  // Journey data from filtered API, transform funnel_data to chart format, fall back to mock
+  const journeyApiData = (journeyResponse as any)?.funnel_data;
+  const journeyData = journeyApiData
+    ? journeyApiData.map((item: any) => ({
+        name: titleCase(item.step_name),
+        users: item.count,
+      }))
+    : journeyMock;
 
-  // Opportunity data from filtered API, fall back to mock
-  const opportunityData = (opportunityResponse as any)?.opportunities || opportunityMock;
+  // Opportunity data from filtered API, transform to chart format, fall back to mock
+  const opportunityApiData = (opportunityResponse as any)?.opportunities;
+  const opportunityData = opportunityApiData
+    ? opportunityApiData.map((item: any) => ({
+        x: item.effort_score,
+        y: item.lift_score,
+        z: item.estimated_impact || item.priority_score * 100,
+        label: item.opportunity_name,
+      }))
+    : opportunityMock;
 
   if (!mounted) {
     return (
