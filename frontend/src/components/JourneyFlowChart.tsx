@@ -15,7 +15,7 @@ interface JourneyFlowChartProps {
 }
 
 export function JourneyFlowChart({ data }: JourneyFlowChartProps) {
-  if (!data || data.length === 0) {
+  if (!data || data.length === 0 || data.every((d) => !d.users)) {
     return (
       <div className="flex h-72 items-center justify-center text-sm text-myntra-text-light">
         No journey data available.
@@ -23,7 +23,7 @@ export function JourneyFlowChart({ data }: JourneyFlowChartProps) {
     );
   }
 
-  const total = data[0].users || 1;
+  const total = data[0].users;
   const last = data[data.length - 1];
   const conversion = total > 0 ? (last.users / total) * 100 : 0;
 
