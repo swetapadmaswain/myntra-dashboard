@@ -202,18 +202,29 @@ export function Dashboard() {
         </button>
       </div>
 
-      <div className="mb-6 overflow-hidden rounded-xl border border-myntra-gray bg-white shadow-sm">
-        <button
-          onClick={() => setShowSnippets(!showSnippets)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-myntra-gray"
-        >
-          <span className="text-sm font-semibold uppercase tracking-wide text-myntra-text-light">Recent Snippets</span>
-          <span className="text-xs text-myntra-text-light">{showSnippets ? '▴' : '▾'}</span>
-        </button>
+      <div className="mb-6">
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowSnippets(!showSnippets)}
+            className="flex h-12 items-center gap-2 rounded-full bg-myntra-pink px-4 text-white shadow-xl transition hover:scale-105 hover:bg-myntra-pink-dark"
+          >
+            <span className="text-sm font-semibold">Recent Snippets</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className={`h-5 w-5 transition-transform ${showSnippets ? 'rotate-180' : ''}`}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+        </div>
         {showSnippets && (
-          <div className="border-t border-myntra-gray p-4">
+          <div className="mt-4">
             {snippetsLoading ? (
-              <div className="flex h-[420px] items-center justify-center text-sm text-myntra-text-light">
+              <div className="flex h-[420px] items-center justify-center rounded-xl bg-white p-8 text-center text-myntra-text-light shadow-sm">
                 Loading snippets...
               </div>
             ) : (
