@@ -61,20 +61,20 @@ async def enrich_and_store(items: list, batch_size: int = 50) -> int:
             chunk = items[i:i + batch_size]
 
             try:
+                conversations = []
+                for item in chunk:
+                    ts = item.get("timestamp")
+                    conversations.append({
+                        "text": item["text"],
+                        "source": item["source"],
+                        "timestamp": ts.isoformat() if hasattr(ts, 'isoformat') else ts,
+                        "author": item.get("author"),
+                        "metadata": item.get("metadata", {})
+                    })
+
                 response = await client.post(
                     f"{settings.nlp_service_url}/process/conversations",
-                    json={
-                        "conversations": [
-                            {
-                                "text": item["text"],
-                                "source": item["source"],
-                                "timestamp": item.get("timestamp"),
-                                "author": item.get("author"),
-                                "metadata": item.get("metadata", {})
-                            }
-                            for item in chunk
-                        ]
-                    }
+                    json={"conversations": conversations}
                 )
                 response.raise_for_status()
                 nlp_results = response.json()
