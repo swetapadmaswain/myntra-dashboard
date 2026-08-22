@@ -53,7 +53,7 @@ db.raw_conversations.insertMany([
       { text: 'medium', label: 'SIZE' },
       { text: 'small', label: 'SIZE' }
     ],
-    timestamp: new Date('2024-01-15'),
+    timestamp: new Date(),
     author: 'user123',
     createdAt: new Date()
   },
@@ -65,7 +65,7 @@ db.raw_conversations.insertMany([
     entities: [
       { text: 'app', label: 'CATEGORY' }
     ],
-    timestamp: new Date('2024-01-15'),
+    timestamp: new Date(),
     author: 'user456',
     createdAt: new Date()
   },
@@ -78,7 +78,7 @@ db.raw_conversations.insertMany([
       { text: 'quality', label: 'CATEGORY' },
       { text: 'color', label: 'COLOR' }
     ],
-    timestamp: new Date('2024-01-15'),
+    timestamp: new Date(),
     author: 'user789',
     createdAt: new Date()
   }

@@ -19,7 +19,7 @@ db.raw_conversations.insertMany([
       subreddit: 'r/IndianFashionAddicts',
       upvotes: 45
     },
-    timestamp: new Date('2024-01-15T10:30:00Z'),
+    timestamp: new Date(),
     author: 'user123',
     source_url: 'https://reddit.com/r/IndianFashionAddicts/comments/abc123',
     upvotes: 45,
@@ -40,7 +40,7 @@ db.raw_conversations.insertMany([
       device: 'iPhone 14',
       rating: 3
     },
-    timestamp: new Date('2024-01-15T14:20:00Z'),
+    timestamp: new Date(),
     author: 'user456',
     source_url: 'https://apps.apple.com/app/reviews',
     upvotes: 0,
@@ -62,7 +62,7 @@ db.raw_conversations.insertMany([
       video_title: 'Myntra Haul 2024',
       channel: 'FashionWithYou'
     },
-    timestamp: new Date('2024-01-15T16:45:00Z'),
+    timestamp: new Date(),
     author: 'user789',
     source_url: 'https://youtube.com/watch?v=xyz789',
     upvotes: 234,
@@ -83,7 +83,7 @@ db.raw_conversations.insertMany([
       subreddit: 'r/myntra',
       upvotes: 89
     },
-    timestamp: new Date('2024-01-15T09:15:00Z'),
+    timestamp: new Date(),
     author: 'user101',
     source_url: 'https://reddit.com/r/myntra/comments/def456',
     upvotes: 89,
@@ -103,7 +103,7 @@ db.raw_conversations.insertMany([
       subreddit: 'r/fashionreps',
       upvotes: 12
     },
-    timestamp: new Date('2024-01-15T11:00:00Z'),
+    timestamp: new Date(),
     author: 'user202',
     source_url: 'https://reddit.com/r/fashionreps/comments/ghi789',
     upvotes: 12,
@@ -124,7 +124,7 @@ db.raw_conversations.insertMany([
       device: 'Samsung Galaxy S23',
       rating: 2
     },
-    timestamp: new Date('2024-01-15T13:30:00Z'),
+    timestamp: new Date(),
     author: 'user303',
     source_url: 'https://apps.apple.com/app/reviews',
     upvotes: 0,
@@ -145,7 +145,7 @@ db.raw_conversations.insertMany([
       video_title: 'Office Wear Haul',
       channel: 'StyleDiaries'
     },
-    timestamp: new Date('2024-01-15T15:20:00Z'),
+    timestamp: new Date(),
     author: 'user404',
     source_url: 'https://youtube.com/watch?v=abc456',
     upvotes: 567,
@@ -165,7 +165,7 @@ db.raw_conversations.insertMany([
       subreddit: 'r/IndianFashionAddicts',
       upvotes: 34
     },
-    timestamp: new Date('2024-01-15T12:45:00Z'),
+    timestamp: new Date(),
     author: 'user505',
     source_url: 'https://reddit.com/r/IndianFashionAddicts/comments/jkl012',
     upvotes: 34,
@@ -187,7 +187,7 @@ db.raw_conversations.insertMany([
       device: 'iPhone 14',
       rating: 3
     },
-    timestamp: new Date('2024-01-15T17:00:00Z'),
+    timestamp: new Date(),
     author: 'user606',
     source_url: 'https://apps.apple.com/app/reviews',
     upvotes: 0,
@@ -208,7 +208,7 @@ db.raw_conversations.insertMany([
       subreddit: 'r/IndianFashionAddicts',
       upvotes: 28
     },
-    timestamp: new Date('2024-01-15T17:30:00Z'),
+    timestamp: new Date(),
     author: 'user707',
     source_url: 'https://reddit.com/r/IndianFashionAddicts/comments/mno345',
     upvotes: 28,
@@ -229,7 +229,7 @@ db.raw_conversations.insertMany([
       video_title: 'Myntra Wishlist Woes',
       channel: 'StyleDiaries'
     },
-    timestamp: new Date('2024-01-15T18:00:00Z'),
+    timestamp: new Date(),
     author: 'user808',
     source_url: 'https://youtube.com/watch?v=def789',
     upvotes: 150,
@@ -251,7 +251,7 @@ db.raw_conversations.insertMany([
       device: 'Samsung Galaxy S23',
       rating: 2
     },
-    timestamp: new Date('2024-01-15T17:20:00Z'),
+    timestamp: new Date(),
     author: 'user909',
     source_url: 'https://apps.apple.com/app/reviews',
     upvotes: 0,
@@ -274,7 +274,7 @@ db.user_journey_events.insertMany([
     metadata: {
       view_duration: 45
     },
-    timestamp: new Date('2024-01-15T10:00:00Z'),
+    timestamp: new Date(),
     device_info: {
       type: 'mobile',
       os: 'iOS',
@@ -296,7 +296,7 @@ db.user_journey_events.insertMany([
     category: 'Dresses',
     brand: 'Myntra',
     metadata: {},
-    timestamp: new Date('2024-01-15T10:02:00Z'),
+    timestamp: new Date(),
     device_info: {
       type: 'mobile',
       os: 'iOS',
@@ -320,7 +320,7 @@ db.user_journey_events.insertMany([
     metadata: {
       similar_count: 5
     },
-    timestamp: new Date('2024-01-15T10:05:00Z'),
+    timestamp: new Date(),
     device_info: {
       type: 'mobile',
       os: 'iOS',
@@ -344,7 +344,7 @@ db.user_journey_events.insertMany([
     metadata: {
       reviews_read: 8
     },
-    timestamp: new Date('2024-01-15T10:10:00Z'),
+    timestamp: new Date(),
     device_info: {
       type: 'mobile',
       os: 'iOS',
@@ -369,7 +369,7 @@ db.user_journey_events.insertMany([
       quantity: 1,
       size: 'M'
     },
-    timestamp: new Date('2024-01-15T10:15:00Z'),
+    timestamp: new Date(),
     device_info: {
       type: 'mobile',
       os: 'iOS',
@@ -394,7 +394,7 @@ db.user_journey_events.insertMany([
       order_value: 1499,
       payment_method: 'UPI'
     },
-    timestamp: new Date('2024-01-15T10:20:00Z'),
+    timestamp: new Date(),
     device_info: {
       type: 'mobile',
       os: 'iOS',
@@ -414,7 +414,7 @@ db.nlp_model_metrics.insertMany([
   {
     model_name: 'sentiment_bert',
     model_version: '1.0.0',
-    metric_date: new Date('2024-01-15'),
+    metric_date: new Date(),
     accuracy: 0.87,
     precision: 0.85,
     recall: 0.89,
@@ -436,7 +436,7 @@ db.nlp_model_metrics.insertMany([
   {
     model_name: 'intent_classifier',
     model_version: '1.0.0',
-    metric_date: new Date('2024-01-15'),
+    metric_date: new Date(),
     accuracy: 0.82,
     precision: 0.80,
     recall: 0.84,
@@ -458,7 +458,7 @@ db.nlp_model_metrics.insertMany([
   {
     model_name: 'hesitation_detector',
     model_version: '1.0.0',
-    metric_date: new Date('2024-01-15'),
+    metric_date: new Date(),
     accuracy: 0.79,
     precision: 0.77,
     recall: 0.81,
