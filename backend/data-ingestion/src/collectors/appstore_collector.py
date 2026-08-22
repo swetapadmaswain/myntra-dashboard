@@ -65,21 +65,31 @@ class AppStoreCollector(BaseCollector):
             self.logger.info(f"Collecting iOS reviews from App Store")
             
             # RSS feed URL for iOS app reviews
-            rss_url = f"https://itunes.apple.com/in/rss/customerreviews/page=1/id={self.IOS_APP_ID}/sortby=mostrecent/xml"
+            rss_url = f"https://itunes.apple.com/in/rss/customerreviews/id={self.IOS_APP_ID}/page=1/sortby=mostrecent/xml"
             
-            feed = feedparser.parse(rss_url)
+            feed = feedparser.parse(rss_url, agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
             reviews = []
             
             for entry in feed.entries[:limit]:
+                content = ''
+                if getattr(entry, 'content', None) and len(entry.content) > 0:
+                    content = entry.content[0].value
+
+                updated = getattr(entry, 'updated_parsed', None) or getattr(entry, 'published_parsed', None)
+                if updated:
+                    updated = datetime(*updated[:6])
+                else:
+                    updated = getattr(entry, 'updated', None) or getattr(entry, 'published', None) or datetime.now()
+
                 normalized_review = self.normalize_item({
-                    'id': entry.id,
-                    'title': entry.title,
-                    'text': entry.content[0].value if entry.content else '',
-                    'author': entry.author,
-                    'rating': entry.get('im:rating', None),
-                    'version': entry.get('im:version', None),
+                    'id': getattr(entry, 'id', ''),
+                    'title': getattr(entry, 'title', ''),
+                    'text': content,
+                    'author': getattr(entry, 'author', None) or 'anonymous',
+                    'rating': getattr(entry, 'im_rating', None) or getattr(entry, 'im:rating', None),
+                    'version': getattr(entry, 'im_version', None) or getattr(entry, 'im:version', None),
                     'store': 'ios',
-                    'updated': entry.updated
+                    'updated': updated
                 })
                 
                 if self.validate_item(normalized_review):
@@ -105,13 +115,7 @@ class AppStoreCollector(BaseCollector):
         try:
             self.logger.info(f"Collecting Android reviews from Google Play Store")
             
-            # Fetch app info and reviews
-            app_info = app(
-                self.ANDROID_PACKAGE_ID,
-                lang='en',
-                country='in'
-            )
-            
+            # Fetch reviews from Google Play Store
             result, continuation_token = play_store_reviews(
                 self.ANDROID_PACKAGE_ID,
                 lang='en',
