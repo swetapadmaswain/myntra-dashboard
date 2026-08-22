@@ -136,6 +136,26 @@ router.get(
 );
 
 /**
+ * GET /api/v1/dashboard/behavioural-analysis
+ */
+router.get(
+  '/behavioural-analysis',
+  validateQuery(dashboardQuerySchema),
+  cacheMiddleware(),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = await proxyRequest('analytics', {
+        path: '/analytics/behavioural-analysis',
+        params: req.query,
+      });
+      res.json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
  * GET /api/v1/dashboard/summary
  */
 router.get(

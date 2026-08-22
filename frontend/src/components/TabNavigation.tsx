@@ -5,6 +5,7 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: 'intent', label: 'Intent Matrix' },
   { key: 'journey', label: 'Journey Tracker' },
   { key: 'opportunity', label: 'Opportunity Matrix' },
+  { key: 'behavioural', label: 'Behavioural Analysis' },
   { key: 'discovery', label: 'Discovery Engine' },
   { key: 'segments', label: 'Segments' },
   { key: 'insights', label: 'Insights' },

@@ -15,6 +15,7 @@ from .analytics.friction_analyzer import friction_analyzer
 from .analytics.intent_analyzer import intent_analyzer
 from .analytics.journey_analyzer import journey_analyzer
 from .analytics.opportunity_analyzer import opportunity_analyzer
+from .analytics.behavioural_analyzer import behavioural_analyzer
 from .database.postgres_client import postgres_client
 
 # Configure structured logging
@@ -252,6 +253,30 @@ async def get_opportunity_matrix(
         
     except Exception as e:
         logger.error(f"Error fetching opportunity matrix: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Behavioural Analysis endpoint
+@app.get("/analytics/behavioural-analysis")
+async def get_behavioural_analysis(
+    segment_id: Optional[int] = Query(None, description="User segment ID"),
+    time_range: str = Query("30d", description="Time range: 7d, 30d, 90d"),
+    source: Optional[str] = Query(None, description="Data source filter"),
+    sentiment: Optional[str] = Query(None, description="Sentiment filter"),
+    hesitation_driver: Optional[str] = Query(None, description="Hesitation driver filter")
+) -> Dict[str, Any]:
+    """
+    Get behavioural analysis for shopper intent, friction and funnel
+    """
+    try:
+        logger.info(f"Fetching behavioural analysis: segment={segment_id}, time_range={time_range}, source={source}, sentiment={sentiment}, hesitation_driver={hesitation_driver}")
+        
+        analysis = behavioural_analyzer.calculate_behavioural_analysis(segment_id, time_range, source, sentiment, hesitation_driver)
+        
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"Error fetching behavioural analysis: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

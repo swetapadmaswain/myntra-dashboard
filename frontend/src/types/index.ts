@@ -41,4 +41,4 @@ export interface FilterState {
   limit: number;
 }
 
-export type TabKey = 'friction' | 'intent' | 'journey' | 'opportunity' | 'discovery' | 'segments' | 'insights' | 'architecture';
+export type TabKey = 'friction' | 'intent' | 'journey' | 'opportunity' | 'behavioural' | 'discovery' | 'segments' | 'insights' | 'architecture';

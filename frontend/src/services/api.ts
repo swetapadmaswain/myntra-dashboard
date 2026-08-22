@@ -71,3 +71,11 @@ export async function fetchOpportunities(filters?: {
 }): Promise<any> {
   return (await api.get('/dashboard/opportunity-matrix', { params: filters })).data;
 }
+
+export async function fetchBehaviouralAnalysis(filters?: {
+  source?: string | null;
+  sentiment?: string | null;
+  hesitation_driver?: string | null;
+}): Promise<any> {
+  return (await api.get('/dashboard/behavioural-analysis', { params: filters })).data;
+}

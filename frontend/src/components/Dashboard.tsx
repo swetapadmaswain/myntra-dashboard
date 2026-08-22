@@ -11,10 +11,11 @@ import { FrictionBarChart } from './FrictionBarChart';
 import { IntentRadarChart } from './IntentRadarChart';
 import { JourneyFlowChart } from './JourneyFlowChart';
 import { OpportunityScatterPlot } from './OpportunityScatterPlot';
+import { BehaviouralAnalysis } from './BehaviouralAnalysis';
 import { SegmentsPanel } from './SegmentsPanel';
 import { InsightsPanel } from './InsightsPanel';
 import { ArchitectureDiagram } from './ArchitectureDiagram';
-import { fetchMetrics, fetchSnippets, fetchFriction, fetchIntentMatrix, fetchJourney, fetchOpportunities } from '@/services/api';
+import { fetchMetrics, fetchSnippets, fetchFriction, fetchIntentMatrix, fetchJourney, fetchOpportunities, fetchBehaviouralAnalysis } from '@/services/api';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { KPIMetrics } from '@/types';
 import { journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
@@ -74,6 +75,12 @@ export function Dashboard() {
     queryKey: ['opportunity', filterParams],
     queryFn: () => fetchOpportunities(filterParams),
     enabled: tab === 'opportunity',
+  });
+
+  const { data: behaviouralResponse } = useQuery({
+    queryKey: ['behavioural', filterParams],
+    queryFn: () => fetchBehaviouralAnalysis(filterParams),
+    enabled: tab === 'behavioural',
   });
 
   const typedMetrics = (metrics as KPIMetrics) || {};
@@ -265,11 +272,13 @@ export function Dashboard() {
             {tab === 'intent' && 'Intent Matrix'}
             {tab === 'journey' && 'Journey Tracker'}
             {tab === 'opportunity' && 'Opportunity Matrix'}
+            {tab === 'behavioural' && 'Behavioural Analysis'}
           </h2>
           {tab === 'friction' && <FrictionBarChart data={frictionData} />}
           {tab === 'intent' && <IntentRadarChart data={intentData} />}
           {tab === 'journey' && <JourneyFlowChart data={journeyData} />}
           {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityData} />}
+          {tab === 'behavioural' && <BehaviouralAnalysis data={behaviouralResponse} />}
           {tab === 'discovery' && <DiscoveryPanel metrics={metrics} />}
         </div>
       </main>
