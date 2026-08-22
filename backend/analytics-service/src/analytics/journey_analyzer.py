@@ -112,9 +112,10 @@ class JourneyAnalyzer:
         """Build MongoDB time range query"""
         return {
             'timestamp': {
-                '$gte': start_date.isoformat(),
-                '$lte': end_date.isoformat()
-            }
+                '$gte': start_date,
+                '$lte': end_date
+            },
+            'processed': True
         }
     
     def _calculate_journey_from_events(self, events: list) -> Dict[str, Any]:
