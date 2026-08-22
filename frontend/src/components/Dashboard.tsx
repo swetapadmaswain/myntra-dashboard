@@ -84,10 +84,13 @@ export function Dashboard() {
     ? frictionApiData.map((item: any) => ({
         name: titleCase(item.name),
         count: item.count,
+        percentage: item.percentage,
+        color: item.color,
       }))
     : Object.entries(typedMetrics.hesitation_distribution || {}).map(([name, count]) => ({
         name: titleCase(name),
         count,
+        percentage: (count / Math.max(Object.values(typedMetrics.hesitation_distribution || {}).reduce((a: number, b: number) => (a as number) + (b as number), 0) as number, 1)) * 100,
       }));
 
   // Build intent chart data from filtered intent API response, fall back to metrics
@@ -95,11 +98,16 @@ export function Dashboard() {
   const intentDist = intentApiData
     ? Object.fromEntries(intentApiData.map((item: any) => [item.intent_type, item.count]))
     : (typedMetrics.intent_distribution || {});
+  const intentPercentageDist = intentApiData
+    ? Object.fromEntries(intentApiData.map((item: any) => [item.intent_type, item.percentage]))
+    : {};
+  const totalIntent = Object.values(intentDist).reduce((s: number, v) => s + (v as number), 0) || 1;
   const maxIntent = Math.max(...Object.values(intentDist), 1);
   const intentData = Object.entries(intentDist).map(([subject, a]) => ({
     subject: titleCase(subject),
     A: a,
     fullMark: maxIntent,
+    percentage: intentPercentageDist[subject] ?? ((a as number) / totalIntent) * 100,
   }));
 
   // Journey data from filtered API, transform funnel_data to chart format, fall back to mock
@@ -108,6 +116,9 @@ export function Dashboard() {
     ? journeyApiData.map((item: any) => ({
         name: titleCase(item.step_name),
         users: item.count,
+        percentage: item.percentage,
+        drop_off_rate: item.drop_off_rate,
+        cumulative_drop_off: item.cumulative_drop_off,
       }))
     : journeyMock;
 
