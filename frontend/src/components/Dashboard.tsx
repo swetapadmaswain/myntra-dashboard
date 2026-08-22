@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { KPICards } from './KPICards';
 import { TabNavigation } from './TabNavigation';
-import { SnippetCarousel } from './SnippetCarousel';
 import { DiscoveryPanel } from './DiscoveryPanel';
 import { ChatBot } from './ChatBot';
 import { FrictionBarChart } from './FrictionBarChart';
@@ -15,10 +14,10 @@ import { BehaviouralAnalysis } from './BehaviouralAnalysis';
 import { SegmentsPanel } from './SegmentsPanel';
 import { InsightsPanel } from './InsightsPanel';
 import { ArchitectureDiagram } from './ArchitectureDiagram';
-import { fetchMetrics, fetchSnippets, fetchFriction, fetchIntentMatrix, fetchJourney, fetchOpportunities, fetchBehaviouralAnalysis } from '@/services/api';
+import { fetchMetrics, fetchFriction, fetchIntentMatrix, fetchJourney, fetchOpportunities, fetchBehaviouralAnalysis } from '@/services/api';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { KPIMetrics } from '@/types';
-import { journeyMock, opportunityMock, snippetMock } from '@/data/mockData';
+import { journeyMock, opportunityMock } from '@/data/mockData';
 
 function titleCase(value: string) {
   return value.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
@@ -26,7 +25,6 @@ function titleCase(value: string) {
 
 export function Dashboard() {
   const [mounted, setMounted] = useState(false);
-  const [showSnippets, setShowSnippets] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const { tab, setTab, filters, setFilter, resetFilters } = useDashboardStore();
@@ -40,17 +38,6 @@ export function Dashboard() {
   const { data: metrics, isLoading: metricsLoading, isError: metricsError } = useQuery({
     queryKey: ['metrics', filterParams],
     queryFn: () => fetchMetrics(filterParams),
-  });
-
-  const { data: snippetsData, isLoading: snippetsLoading, isError: snippetsError } = useQuery({
-    queryKey: ['snippets', filters],
-    queryFn: () =>
-      fetchSnippets({
-        page: filters.page,
-        limit: filters.limit,
-        sentiment: filters.sentiment,
-        hesitation_driver: filters.hesitation_driver,
-      }),
   });
 
   const { data: frictionResponse } = useQuery({
@@ -218,38 +205,6 @@ export function Dashboard() {
         >
           Reset
         </button>
-      </div>
-
-      <div className="mb-6">
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShowSnippets(!showSnippets)}
-            className="flex h-12 items-center gap-2 rounded-full bg-myntra-pink px-4 text-white shadow-xl transition hover:scale-105 hover:bg-myntra-pink-dark"
-          >
-            <span className="text-sm font-semibold">Recent Snippets</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className={`h-5 w-5 transition-transform ${showSnippets ? 'rotate-180' : ''}`}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
-          </button>
-        </div>
-        {showSnippets && (
-          <div className="mt-4">
-            {snippetsLoading ? (
-              <div className="flex h-[420px] items-center justify-center rounded-xl bg-white p-8 text-center text-myntra-text-light shadow-sm">
-                Loading snippets...
-              </div>
-            ) : (
-              <SnippetCarousel snippets={snippetsData?.snippets || snippetMock} />
-            )}
-          </div>
-        )}
       </div>
 
       <TabNavigation active={tab} onChange={setTab} />
