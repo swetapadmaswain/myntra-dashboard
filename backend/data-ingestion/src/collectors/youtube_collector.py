@@ -202,13 +202,8 @@ class YouTubeCollector(BaseCollector):
         # Extract entities
         entities = self.entity_extractor.extract_all(masked_text)
         
-        # Parse timestamp
-        timestamp = raw_item.get('published_at', datetime.now())
-        if isinstance(timestamp, str):
-            try:
-                timestamp = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
-            except:
-                timestamp = datetime.now()
+        # Use current time as the dashboard timestamp; keep real published_at in metadata
+        timestamp = datetime.now()
         
         return {
             'text': masked_text,
@@ -223,14 +218,15 @@ class YouTubeCollector(BaseCollector):
                 'video_id': raw_item.get('video_id', raw_item['id']),
                 'view_count': raw_item.get('view_count', 0),
                 'like_count': raw_item.get('like_count', 0),
-                'comment_count': raw_item.get('comment_count', 0)
+                'comment_count': raw_item.get('comment_count', 0),
+                'published_at': raw_item.get('published_at')
             },
-            'timestamp': timestamp.isoformat() if hasattr(timestamp, 'isoformat') else str(timestamp),
+            'timestamp': timestamp,
             'author': self.pii_masker.mask_username(raw_item['author']),
             'source_url': f"https://youtube.com/watch?v={raw_item['id']}" if raw_item['type'] == 'video' else '',
             'upvotes': raw_item.get('like_count', 0),
             'replies': raw_item.get('comment_count', 0),
             'processed': False,
-            'createdAt': datetime.now().isoformat(),
-            'updatedAt': datetime.now().isoformat()
+            'createdAt': datetime.now(),
+            'updatedAt': datetime.now()
         }
