@@ -1,107 +1,86 @@
-# Myntra Dashboard - Deployment Plan
+# Myntra Dashboard - Vercel + Render Deployment Plan
 
 ## Goal
-Deploy the full Myntra Dashboard stack to a live, cost-free (or mostly free) production environment.
+Deploy the Next.js frontend on Vercel (free hobby tier) and the backend services on Render (free tier) using free managed databases.
 
 ## Tooling (all free)
-- **Cloud VM:** Oracle Cloud Infrastructure (OCI) Always Free `VM.Standard.A1.Flex` (up to 4 OCPUs and 24 GB RAM)
-- **DNS / CDN:** Cloudflare (free plan)
-- **SSL:** Caddy (auto-managed Let's Encrypt)
-- **Container runtime:** Docker + Docker Compose
-- **CI/CD (optional):** GitHub Actions (free for public repos) to build and push images to GitHub Container Registry
+- **Frontend:** Vercel hobby plan
+- **Backend web services:** Render free web services
+- **PostgreSQL:** Supabase free tier (or Render 90-day free PostgreSQL)
+- **MongoDB:** MongoDB Atlas M0 free cluster
+- **Redis:** Upstash free Redis
+- **SSL / CDN:** Included with Vercel and Render automatically
 
-## Architecture Overview
-The stack is composed of these logical tiers:
+## Pre-requisites
+1. A GitHub repository at `https://github.com/swetapadmaswain/myntra-dashboard`.
+2. A Vercel account linked to GitHub.
+3. A Render account linked to GitHub.
+4. A YouTube Data API v3 key.
 
-1. **Databases:** PostgreSQL, MongoDB, Redis (all self-hosted in Docker)
-2. **Backend services:** API Gateway, Data Ingestion, NLP, Analytics (all containerised FastAPI/Express services)
-3. **Frontend:** Next.js production build behind a reverse proxy
-4. **Proxy / SSL:** Caddy on ports 80/443
+---
 
-All services run on a single OCI `VM.Standard.A1.Flex` instance via `docker-compose.prod.yml`.
+## Step 1 - Set up free managed databases
 
-## Step-by-step Deployment
+### 1.1 Supabase PostgreSQL
+1. Create a project at [https://supabase.com](https://supabase.com).
+2. Copy the **Connection string** from `Settings > Database`.
+3. Note the host, port (`5432`), database name, user, and password.
 
-### Step 1 - Provision the free cloud server
-1. Create an Oracle Cloud Free Tier account at [https://www.oracle.com/cloud/free/](https://www.oracle.com/cloud/free/).
-2. In the OCI console, create a `VM.Standard.A1.Flex` instance with:
-   - Shape: 4 OCPUs, 24 GB RAM (Always Free-eligible)
-   - OS: Canonical Ubuntu 22.04
-   - Boot volume: 100 GB
-   - Networking: allow ingress on TCP ports `22`, `80`, and `443`
-3. Note the public IP address.
+### 1.2 MongoDB Atlas
+1. Create a free M0 cluster at [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas).
+2. Create a user and allow access from anywhere (`0.0.0.0/0`) for Render.
+3. Copy the connection string or SRV host.
 
-### Step 2 - Configure DNS
-1. Add an `A` record in Cloudflare (or any free DNS provider) pointing `myntra.example.com` to the server IP.
-2. Wait for DNS propagation.
+### 1.3 Upstash Redis
+1. Create a free database at [https://upstash.com](https://upstash.com).
+2. Copy the endpoint and token.
 
-### Step 3 - Prepare the server
-SSH into the instance and run:
+---
 
-```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-v2 git
-sudo usermod -aG docker $USER
-newgrp docker
-```
+## Step 2 - Deploy the backend on Render
 
-Clone the repository:
+1. In Render, click **New > Blueprint** and connect your GitHub repository.
+2. Select the `develop` branch and the `render.yaml` blueprint.
+3. Render will create four free web services:
+   - `myntra-nlp-service`
+   - `myntra-analytics-service`
+   - `myntra-data-ingestion`
+   - `myntra-api-gateway`
+4. For each service, open the **Environment** tab and fill in the `<set in dashboard>` variables with values from Step 1.
+5. Save and trigger a deploy.
 
-```bash
-git clone https://github.com/swetapadmaswain/myntra-dashboard.git
-cd myntra-dashboard
-git checkout develop
-```
+> **Important:** The free Render web service has 512 MB RAM. The `myntra-nlp-service` with a transformer model usually needs more. If it crashes on startup, upgrade only that service to a `Starter` plan, or replace the local NLP model with a hosted Hugging Face Inference API.
 
-### Step 4 - Create the production environment file
+---
 
-```bash
-cp .env.prod.example .env
-nano .env
-```
+## Step 3 - Deploy the frontend on Vercel
 
-Fill in the real values, especially:
-- `DOMAIN` (e.g. `myntra.example.com`)
-- `POSTGRES_PASSWORD`
-- `MONGODB_PASSWORD`
-- `JWT_SECRET`
-- `YOUTUBE_API_KEY`
+1. In Vercel, click **New Project** and import the GitHub repository.
+2. Select the `develop` branch.
+3. Set the **Root Directory** to `frontend`.
+4. Add the following environment variable in the Vercel dashboard:
+   - `NEXT_PUBLIC_API_URL` = `https://myntra-api-gateway-xxx.onrender.com/api/v1`
+   - Replace `xxx` with the actual Render subdomain shown in your `myntra-api-gateway` service.
+5. Click **Deploy**.
 
-### Step 5 - Deploy
+The dashboard will be live at `https://<vercel-project>.vercel.app`.
 
-```bash
-./deploy.sh
-```
+---
 
-This will build all production images, tear down any existing containers, and bring up the stack.
+## Step 4 - Trigger initial data ingestion
 
-### Step 6 - Verify
+Once the services are healthy, trigger the first YouTube ingestion:
 
 ```bash
-docker compose -f docker-compose.prod.yml ps
-curl -f https://$DOMAIN/health 2>/dev/null || echo "not ready yet"
+curl -X POST https://<myntra-data-ingestion-url>/ingest/youtube?limit=300
 ```
 
-The dashboard should be available at `https://myntra.example.com`.
+NLP processing runs in the background; charts will populate as it completes.
 
-### Step 7 - Initial data ingestion (manual)
+---
 
-YouTube data is collected on demand. To trigger the first production ingestion:
+## Post-deployment notes
 
-```bash
-docker compose -f docker-compose.prod.yml exec data-ingestion \
-  curl -X POST "http://localhost:8002/ingest/youtube?limit=300"
-```
-
-NLP processing runs in the background; the friction chart will populate as it completes.
-
-## Post-deployment maintenance
-
-- **Logs:** `docker compose -f docker-compose.prod.yml logs -f <service>`
-- **Updates:** edit the repo, run `git pull` and then `./deploy.sh` again
-- **Backups:** snapshot the `*_data` Docker volumes regularly
-- **Security:** keep Docker, host OS, and npm/pip dependencies patched
-
-## Cost caveats
-- OCI Always Free is free indefinitely if you remain within the free tier limits.
-- Cloudflare DNS/SSL proxy is free.
-- If the OCI A1 instance is unavailable in your region, fall back to an AWS EC2 `t3.micro` free tier instance (1 GB RAM is tight and may require removing databases to managed free tiers).
+- **Free Render services sleep after 15 minutes of inactivity.** The first request after sleeping may take 30-60 seconds to wake up.
+- **Keep API keys and database credentials in the Render / Vercel dashboards, never in the repo.**
+- **CORS:** If the frontend cannot call the API, add your Vercel domain to the API Gateway's CORS allowed origins.

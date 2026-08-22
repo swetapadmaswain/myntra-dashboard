@@ -1,0 +1,174 @@
+services:
+  - type: web
+    name: myntra-nlp-service
+    runtime: docker
+    repo: https://github.com/swetapadmaswain/myntra-dashboard
+    branch: develop
+    rootDir: backend/nlp-service
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: POSTGRES_HOST
+        value: <set in dashboard>
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: myntra_dashboard
+      - key: POSTGRES_USER
+        value: <set in dashboard>
+      - key: POSTGRES_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_HOST
+        value: <set in dashboard>
+      - key: MONGODB_PORT
+        value: "27017"
+      - key: MONGODB_USER
+        value: <set in dashboard>
+      - key: MONGODB_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_DB
+        value: myntra_dashboard
+      - key: REDIS_HOST
+        value: <set in dashboard>
+      - key: REDIS_PORT
+        value: "6379"
+      - key: CELERY_BROKER_URL
+        value: <set in dashboard>
+      - key: CELERY_RESULT_BACKEND
+        value: <set in dashboard>
+    healthCheckPath: /health
+
+  - type: web
+    name: myntra-analytics-service
+    runtime: docker
+    repo: https://github.com/swetapadmaswain/myntra-dashboard
+    branch: develop
+    rootDir: backend/analytics-service
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: "8001"
+      - key: POSTGRES_HOST
+        value: <set in dashboard>
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: myntra_dashboard
+      - key: POSTGRES_USER
+        value: <set in dashboard>
+      - key: POSTGRES_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_HOST
+        value: <set in dashboard>
+      - key: MONGODB_PORT
+        value: "27017"
+      - key: MONGODB_USER
+        value: <set in dashboard>
+      - key: MONGODB_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_DB
+        value: myntra_dashboard
+      - key: REDIS_HOST
+        value: <set in dashboard>
+      - key: REDIS_PORT
+        value: "6379"
+    healthCheckPath: /health
+
+  - type: web
+    name: myntra-data-ingestion
+    runtime: docker
+    repo: https://github.com/swetapadmaswain/myntra-dashboard
+    branch: develop
+    rootDir: backend/data-ingestion
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: PORT
+        value: "8002"
+      - key: POSTGRES_HOST
+        value: <set in dashboard>
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: myntra_dashboard
+      - key: POSTGRES_USER
+        value: <set in dashboard>
+      - key: POSTGRES_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_HOST
+        value: <set in dashboard>
+      - key: MONGODB_PORT
+        value: "27017"
+      - key: MONGODB_USER
+        value: <set in dashboard>
+      - key: MONGODB_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_DB
+        value: myntra_dashboard
+      - key: REDIS_HOST
+        value: <set in dashboard>
+      - key: REDIS_PORT
+        value: "6379"
+      - key: YOUTUBE_API_KEY
+        value: <set in dashboard>
+      - key: NLP_SERVICE_URL
+        fromService:
+          type: web
+          name: myntra-nlp-service
+          property: url
+    healthCheckPath: /health
+
+  - type: web
+    name: myntra-api-gateway
+    runtime: docker
+    repo: https://github.com/swetapadmaswain/myntra-dashboard
+    branch: develop
+    rootDir: backend/api-gateway
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: POSTGRES_HOST
+        value: <set in dashboard>
+      - key: POSTGRES_PORT
+        value: "5432"
+      - key: POSTGRES_DB
+        value: myntra_dashboard
+      - key: POSTGRES_USER
+        value: <set in dashboard>
+      - key: POSTGRES_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_HOST
+        value: <set in dashboard>
+      - key: MONGODB_PORT
+        value: "27017"
+      - key: MONGODB_USER
+        value: <set in dashboard>
+      - key: MONGODB_PASSWORD
+        value: <set in dashboard>
+      - key: MONGODB_DB
+        value: myntra_dashboard
+      - key: REDIS_HOST
+        value: <set in dashboard>
+      - key: REDIS_PORT
+        value: "6379"
+      - key: JWT_SECRET
+        value: <set in dashboard>
+      - key: NLP_SERVICE_URL
+        fromService:
+          type: web
+          name: myntra-nlp-service
+          property: url
+      - key: ANALYTICS_SERVICE_URL
+        fromService:
+          type: web
+          name: myntra-analytics-service
+          property: url
+      - key: DATA_INGESTION_SERVICE_URL
+        fromService:
+          type: web
+          name: myntra-data-ingestion
+          property: url
+    healthCheckPath: /health
