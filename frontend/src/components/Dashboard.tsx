@@ -25,6 +25,7 @@ function titleCase(value: string) {
 
 export function Dashboard() {
   const [mounted, setMounted] = useState(false);
+  const [showSnippets, setShowSnippets] = useState(false);
   useEffect(() => setMounted(true), []);
 
   const { tab, setTab, filters, setFilter, resetFilters } = useDashboardStore();
@@ -201,6 +202,27 @@ export function Dashboard() {
         </button>
       </div>
 
+      <div className="mb-6 overflow-hidden rounded-xl border border-myntra-gray bg-white shadow-sm">
+        <button
+          onClick={() => setShowSnippets(!showSnippets)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left transition hover:bg-myntra-gray"
+        >
+          <span className="text-sm font-semibold uppercase tracking-wide text-myntra-text-light">Recent Snippets</span>
+          <span className="text-xs text-myntra-text-light">{showSnippets ? '▴' : '▾'}</span>
+        </button>
+        {showSnippets && (
+          <div className="border-t border-myntra-gray p-4">
+            {snippetsLoading ? (
+              <div className="flex h-[420px] items-center justify-center text-sm text-myntra-text-light">
+                Loading snippets...
+              </div>
+            ) : (
+              <SnippetCarousel snippets={snippetsData?.snippets || snippetMock} />
+            )}
+          </div>
+        )}
+      </div>
+
       <TabNavigation active={tab} onChange={setTab} />
 
       {/* Full-width tabs: segments, insights, architecture */}
@@ -212,33 +234,21 @@ export function Dashboard() {
         </main>
       )}
 
-      {/* Standard 2/3 + 1/3 layout tabs */}
+      {/* Standard full-width layout tabs */}
       {tab !== 'segments' && tab !== 'insights' && tab !== 'architecture' && (
-      <main className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <div className="rounded-xl bg-white p-4 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-myntra-text-dark">
-              {tab === 'friction' && 'Friction Breakdown'}
-              {tab === 'intent' && 'Intent Matrix'}
-              {tab === 'journey' && 'Journey Tracker'}
-              {tab === 'opportunity' && 'Opportunity Matrix'}
-            </h2>
-            {tab === 'friction' && <FrictionBarChart data={frictionData} />}
-            {tab === 'intent' && <IntentRadarChart data={intentData} />}
-            {tab === 'journey' && <JourneyFlowChart data={journeyData} />}
-            {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityData} />}
-            {tab === 'discovery' && <DiscoveryPanel metrics={metrics} />}
-          </div>
-        </div>
-
-        <div className="lg:sticky lg:top-6 lg:self-start">
-          {snippetsLoading ? (
-            <div className="flex h-[420px] items-center justify-center rounded-xl bg-white p-8 text-center shadow-sm">
-              Loading snippets...
-            </div>
-          ) : (
-            <SnippetCarousel snippets={snippetsData?.snippets || snippetMock} />
-          )}
+      <main className="mt-6">
+        <div className="rounded-xl bg-white p-4 shadow-sm">
+          <h2 className="mb-4 text-lg font-semibold text-myntra-text-dark">
+            {tab === 'friction' && 'Friction Breakdown'}
+            {tab === 'intent' && 'Intent Matrix'}
+            {tab === 'journey' && 'Journey Tracker'}
+            {tab === 'opportunity' && 'Opportunity Matrix'}
+          </h2>
+          {tab === 'friction' && <FrictionBarChart data={frictionData} />}
+          {tab === 'intent' && <IntentRadarChart data={intentData} />}
+          {tab === 'journey' && <JourneyFlowChart data={journeyData} />}
+          {tab === 'opportunity' && <OpportunityScatterPlot data={opportunityData} />}
+          {tab === 'discovery' && <DiscoveryPanel metrics={metrics} />}
         </div>
       </main>
       )}
