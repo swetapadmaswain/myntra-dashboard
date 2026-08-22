@@ -15,14 +15,11 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download spaCy model
-RUN pip install --no-cache-dir https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+# Download NLTK data for VADER
+RUN python -m nltk.downloader -d /usr/local/share/nltk_data vader_lexicon
 
 # Copy application code
 COPY src/ ./src/
-
-# Create models directory
-RUN mkdir -p models
 
 # Create non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
