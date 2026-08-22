@@ -105,7 +105,7 @@ def initialize_redis(host='localhost', port=6379, db=0, password=None):
         friction_data = {
             'friction_types': [
                 {'name': 'fit_sizing', 'percentage': 24.3, 'trend': 'down', 'color': '#ff3f6c'},
-                {'name': 'styling_wardrobe', 'percentage': 22.1, 'trend': 'up', 'color': '#ff905a'},
+                {'name': 'product_styling', 'percentage': 22.1, 'trend': 'up', 'color': '#9333ea'},
                 {'name': 'social_validation', 'percentage': 18.7, 'trend': 'neutral', 'color': '#282c3f'},
                 {'name': 'visual_reality', percentage: 19.4, 'trend': 'up', 'color': '#535766'},
                 {'name': 'price_value', 'percentage': 15.5, 'trend': 'down', 'color': '#eaeaec'}

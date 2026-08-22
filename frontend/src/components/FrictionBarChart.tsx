@@ -7,11 +7,10 @@ interface FrictionBarChartProps {
 
 const defaultColors: Record<string, string> = {
   'Fit Sizing': '#ff3f6c',
-  'Styling Wardrobe': '#ff905a',
+  'Product Styling': '#9333ea',
   'Social Validation': '#282c3f',
   'Visual Reality': '#535766',
-  'Price Value': '#3b82f6',
-  'Wishlist Styling': '#9333ea',
+  'Price Value': '#eaeaec',
 };
 
 export function FrictionBarChart({ data }: FrictionBarChartProps) {

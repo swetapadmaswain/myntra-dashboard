@@ -25,7 +25,7 @@ const rawConversationsSchema = new Schema({
   hesitation_driver: {
     type: String,
     required: true,
-    enum: ['fit_sizing', 'styling_wardrobe', 'social_validation', 'visual_reality', 'price_value'],
+    enum: ['fit_sizing', 'product_styling', 'social_validation', 'visual_reality', 'price_value'],
     index: true
   },
   entities: [{

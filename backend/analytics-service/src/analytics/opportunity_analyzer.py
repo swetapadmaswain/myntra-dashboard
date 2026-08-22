@@ -132,7 +132,7 @@ class OpportunityAnalyzer:
                     'base_lift': 7
                 }
             ],
-            'styling_wardrobe': [
+            'product_styling': [
                 {
                     'name': 'Style recommendation engine',
                     'description': 'AI-powered outfit suggestions based on user preferences',

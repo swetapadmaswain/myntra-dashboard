@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class HesitationDetector(nn.Module):
     """CNN + BiLSTM model for hesitation driver detection"""
     
-    LABELS = ['fit_sizing', 'styling_wardrobe', 'social_validation', 'visual_reality', 'price_value']
+    LABELS = ['fit_sizing', 'product_styling', 'social_validation', 'visual_reality', 'price_value']
     
     def __init__(self, vocab_size: int, embedding_dim: int = 300, hidden_dim: int = 128, num_classes: int = 5):
         """

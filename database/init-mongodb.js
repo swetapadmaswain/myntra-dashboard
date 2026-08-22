@@ -61,7 +61,7 @@ db.raw_conversations.insertMany([
     source: 'appstore',
     text: 'Great app but the return process is too complicated. Wish it was easier.',
     sentiment: 'neutral',
-    hesitation_driver: 'styling_wardrobe',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'app', label: 'CATEGORY' }
     ],

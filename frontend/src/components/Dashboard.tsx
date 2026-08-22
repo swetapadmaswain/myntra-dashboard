@@ -201,7 +201,7 @@ export function Dashboard() {
           <option value="fit_sizing">Fit / Sizing</option>
           <option value="visual_reality">Visual / Reality</option>
           <option value="price_value">Price / Value</option>
-          <option value="styling_wardrobe">Styling / Wardrobe</option>
+          <option value="product_styling">Product Styling</option>
           <option value="social_validation">Social Validation</option>
         </select>
 

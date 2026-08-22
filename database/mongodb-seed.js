@@ -31,7 +31,7 @@ db.raw_conversations.insertMany([
     text: 'Great app but the return process is too complicated. Wish it was easier to return items that dont fit.',
     source: 'appstore',
     sentiment: 'neutral',
-    hesitation_driver: 'styling_wardrobe',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'app', label: 'CATEGORY', confidence: 0.88 }
     ],
@@ -136,7 +136,7 @@ db.raw_conversations.insertMany([
     text: 'Stylish and comfortable! Perfect for office wear. Will definitely buy more from this collection.',
     source: 'youtube',
     sentiment: 'positive',
-    hesitation_driver: 'styling_wardrobe',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'office', label: 'OCCASION', confidence: 0.91 }
     ],
@@ -177,7 +177,7 @@ db.raw_conversations.insertMany([
     text: 'I added this jacket to my wishlist but I have no idea how to style it for an evening out. Outfit tips would help so much.',
     source: 'appstore',
     sentiment: 'neutral',
-    hesitation_driver: 'wishlist_styling',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'jacket', label: 'CATEGORY', confidence: 0.91 },
       { text: 'evening', label: 'OCCASION', confidence: 0.85 }
@@ -199,7 +199,7 @@ db.raw_conversations.insertMany([
     text: 'Wishlisted these jeans but not sure what top to pair them with. Need styling inspiration before I buy.',
     source: 'reddit',
     sentiment: 'neutral',
-    hesitation_driver: 'wishlist_styling',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'jeans', label: 'CATEGORY', confidence: 0.93 },
       { text: 'top', label: 'CATEGORY', confidence: 0.88 }
@@ -220,7 +220,7 @@ db.raw_conversations.insertMany([
     text: 'I keep saving items to my wishlist but I never know how to actually wear them. Would love lookbook suggestions.',
     source: 'youtube',
     sentiment: 'neutral',
-    hesitation_driver: 'wishlist_styling',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'lookbook', label: 'CATEGORY', confidence: 0.87 }
     ],
@@ -241,7 +241,7 @@ db.raw_conversations.insertMany([
     text: 'There is this dress in my wishlist but I do not know what accessories or shoes will go with it. Styling guidance missing.',
     source: 'appstore',
     sentiment: 'negative',
-    hesitation_driver: 'wishlist_styling',
+    hesitation_driver: 'product_styling',
     entities: [
       { text: 'dress', label: 'CATEGORY', confidence: 0.95 },
       { text: 'accessories', label: 'CATEGORY', confidence: 0.86 }
@@ -465,7 +465,7 @@ db.nlp_model_metrics.insertMany([
     f1_score: 0.79,
     confusion_matrix: {
       'fit_sizing': { 'correct': 210, 'incorrect': 40 },
-      'styling_wardrobe': { 'correct': 180, 'incorrect': 35 },
+      'product_styling': { 'correct': 180, 'incorrect': 35 },
       'social_validation': { 'correct': 150, 'incorrect': 30 },
       'visual_reality': { 'correct': 165, 'incorrect': 35 },
       'price_value': { 'correct': 140, 'incorrect': 25 }
@@ -514,7 +514,7 @@ db.aggregation_cache.insertMany([
     data: {
       friction_types: [
         { name: 'fit_sizing', percentage: 21.2, trend: 'neutral' },
-        { name: 'styling_wardrobe', percentage: 24.5, trend: 'up' },
+        { name: 'product_styling', percentage: 24.5, trend: 'up' },
         { name: 'social_validation', percentage: 12.3, trend: 'down' }
       ]
     },

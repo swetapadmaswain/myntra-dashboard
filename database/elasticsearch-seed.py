@@ -58,7 +58,7 @@ def seed_elasticsearch(host='localhost', port=9200, index_name='conversations'):
                 "text": "Great app but the return process is too complicated. Wish it was easier to return items that dont fit.",
                 "source": "appstore",
                 "sentiment": "neutral",
-                "hesitation_driver": "styling_wardrobe",
+                "hesitation_driver": "product_styling",
                 "entities": [
                     {"text": "app", "label": "CATEGORY", "confidence": 0.88}
                 ],
@@ -168,7 +168,7 @@ def seed_elasticsearch(host='localhost', port=9200, index_name='conversations'):
                 "text": "Stylish and comfortable! Perfect for office wear. Will definitely buy more from this collection.",
                 "source": "youtube",
                 "sentiment": "positive",
-                "hesitation_driver": "styling_wardrobe",
+                "hesitation_driver": "product_styling",
                 "entities": [
                     {"text": "office", "label": "OCCASION", "confidence": 0.91}
                 ],

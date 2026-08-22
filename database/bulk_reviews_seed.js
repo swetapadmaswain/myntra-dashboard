@@ -6,7 +6,7 @@ const batchSize = 1000;
 
 const sources = ['appstore', 'youtube', 'reddit'];
 const sentiments = ['positive', 'neutral', 'negative'];
-const frictionTypes = ['fit_sizing', 'styling_wardrobe', 'social_validation', 'visual_reality', 'price_value', 'wishlist_styling'];
+const frictionTypes = ['fit_sizing', 'product_styling', 'social_validation', 'visual_reality', 'price_value'];
 const intents = ['research', 'bookmarking', 'immediate_purchase', 'comparison'];
 
 const reviewTemplates = [
@@ -44,11 +44,10 @@ const reviewTemplates = [
 
 const entitiesByFriction = {
   fit_sizing: [{ text: 'size', label: 'CATEGORY', confidence: 0.9 }],
-  styling_wardrobe: [{ text: 'outfit', label: 'CATEGORY', confidence: 0.88 }],
+  product_styling: [{ text: 'outfit', label: 'CATEGORY', confidence: 0.88 }],
   social_validation: [{ text: 'brand', label: 'BRAND', confidence: 0.82 }],
   visual_reality: [{ text: 'color', label: 'COLOR', confidence: 0.92 }],
-  price_value: [{ text: 'price', label: 'CATEGORY', confidence: 0.87 }],
-  wishlist_styling: [{ text: 'wishlist', label: 'CATEGORY', confidence: 0.91 }]
+  price_value: [{ text: 'price', label: 'CATEGORY', confidence: 0.87 }]
 };
 
 function randomItem(arr) {
