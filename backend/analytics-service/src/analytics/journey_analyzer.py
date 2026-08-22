@@ -70,15 +70,10 @@ class JourneyAnalyzer:
         
         try:
             # Fetch user journey events from MongoDB
+            # Journey events are not conversation snippets, so only time/segment filters apply
             query = self._build_time_query(start_date, end_date)
             if segment_id:
                 query['metadata.segment_id'] = segment_id
-            if source:
-                query['source'] = source
-            if sentiment:
-                query['sentiment'] = sentiment
-            if hesitation_driver:
-                query['hesitation_driver'] = hesitation_driver
             
             events = mongodb_client.find(
                 'user_journey_events',
