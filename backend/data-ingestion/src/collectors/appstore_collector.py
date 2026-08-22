@@ -190,12 +190,12 @@ class AppStoreCollector(BaseCollector):
                 'version': raw_item.get('version'),
                 'app_id': raw_item['id']
             },
-            'timestamp': timestamp.isoformat() if hasattr(timestamp, 'isoformat') else str(timestamp),
+            'timestamp': timestamp,
             'author': self.pii_masker.mask_username(raw_item['author']),
             'source_url': '',
             'upvotes': 0,
             'replies': 0,
             'processed': False,
-            'createdAt': datetime.now().isoformat(),
-            'updatedAt': datetime.now().isoformat()
+            'createdAt': datetime.now(),
+            'updatedAt': datetime.now()
         }

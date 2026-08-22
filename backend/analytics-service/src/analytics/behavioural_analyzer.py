@@ -57,7 +57,7 @@ class BehaviouralAnalyzer:
             )
 
             # Journey events are not processed-flagged; filter by time only
-            journey_query = {'timestamp': {'$gte': start_date.isoformat(), '$lte': end_date.isoformat()}}
+            journey_query = {'timestamp': {'$gte': start_date, '$lte': end_date}}
             journey_events = mongodb_client.find(
                 'user_journey_events',
                 journey_query,

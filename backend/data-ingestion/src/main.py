@@ -64,10 +64,18 @@ async def enrich_and_store(items: list, batch_size: int = 50) -> int:
                 conversations = []
                 for item in chunk:
                     ts = item.get("timestamp")
+                    if isinstance(ts, str):
+                        try:
+                            ts = datetime.fromisoformat(ts)
+                        except Exception:
+                            ts = datetime.now()
+                    elif not hasattr(ts, 'isoformat'):
+                        ts = datetime.now()
+                    item["timestamp"] = ts
                     conversations.append({
                         "text": item["text"],
                         "source": item["source"],
-                        "timestamp": ts.isoformat() if hasattr(ts, 'isoformat') else ts,
+                        "timestamp": ts.isoformat(),
                         "author": item.get("author"),
                         "metadata": item.get("metadata", {})
                     })

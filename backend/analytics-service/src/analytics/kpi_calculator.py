@@ -119,8 +119,8 @@ class KPICalculator:
         """
         return {
             'timestamp': {
-                '$gte': start_date.isoformat(),
-                '$lte': end_date.isoformat()
+                '$gte': start_date,
+                '$lte': end_date
             },
             'processed': True
         }
