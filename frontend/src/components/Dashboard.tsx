@@ -112,12 +112,17 @@ export function Dashboard() {
 
   // Opportunity data from filtered API, transform to chart format, fall back to mock
   const opportunityApiData = (opportunityResponse as any)?.opportunities;
-  const opportunityData = opportunityApiData
+  const opportunityData = opportunityApiData?.length
     ? opportunityApiData.map((item: any) => ({
         x: item.effort_score,
         y: item.lift_score,
         z: item.estimated_impact || item.priority_score * 100,
         label: item.opportunity_name,
+        description: item.description,
+        quadrant: item.quadrant,
+        priority_score: item.priority_score,
+        related_friction: item.related_friction,
+        friction_percentage: item.friction_percentage,
       }))
     : opportunityMock;
 

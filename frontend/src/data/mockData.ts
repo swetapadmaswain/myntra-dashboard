@@ -23,11 +23,11 @@ export const journeyMock = [
 ];
 
 export const opportunityMock = [
-  { x: 80, y: 20, z: 300, label: 'Price drop alerts' },
-  { x: 60, y: 70, z: 200, label: 'Size guides' },
-  { x: 30, y: 40, z: 150, label: 'AR try-on' },
-  { x: 90, y: 85, z: 400, label: 'Wishlist share' },
-  { x: 20, y: 60, z: 120, label: 'Reviews' },
+  { x: 3, y: 8, z: 420, label: 'Improve size guide accuracy', description: 'Enhanced size charts with measurements and fit recommendations', quadrant: 'quick_wins', priority_score: 5.5, related_friction: 'fit_sizing', friction_percentage: 32 },
+  { x: 6, y: 8, z: 380, label: 'Add user-generated fit photos', description: 'Show real customer photos with size information', quadrant: 'major_projects', priority_score: 3.8, related_friction: 'fit_sizing', friction_percentage: 32 },
+  { x: 8, y: 9, z: 520, label: 'AR visualization', description: 'Augmented reality product visualization', quadrant: 'strategic_bets', priority_score: 3.9, related_friction: 'visual_reality', friction_percentage: 22 },
+  { x: 7, y: 6, z: 180, label: 'Wardrobe integration', description: 'Allow users to build virtual wardrobes', quadrant: 'fill_ins', priority_score: 1.5, related_friction: 'styling_wardrobe', friction_percentage: 15 },
+  { x: 4, y: 7, z: 310, label: 'Video content integration', description: 'Product videos and try-on demonstrations', quadrant: 'quick_wins', priority_score: 4.3, related_friction: 'visual_reality', friction_percentage: 22 },
 ];
 
 export const snippetMock = [
