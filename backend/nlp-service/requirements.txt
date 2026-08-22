@@ -13,7 +13,6 @@ redis==5.0.1
 celery==5.3.4
 
 # Lightweight NLP
-vaderSentiment==3.3.2
 nltk==3.8.1
 
 # Data processing

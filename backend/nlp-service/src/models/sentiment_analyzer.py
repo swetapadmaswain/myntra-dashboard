@@ -6,7 +6,7 @@ Lightweight VADER rule-based sentiment analysis
 from typing import List, Dict, Any
 import logging
 
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 logger = logging.getLogger(__name__)
 
