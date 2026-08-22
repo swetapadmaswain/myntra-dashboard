@@ -53,7 +53,8 @@ class YouTubeCollector(BaseCollector):
     
     async def collect(self, limit: int = 50) -> List[Dict[str, Any]]:
         """
-        Collect videos and comments from YouTube
+        Collect videos and comments from YouTube. Supports limit > 50 by
+        paginating the search results.
         
         Args:
             limit: Maximum number of videos to collect per query
@@ -71,46 +72,63 @@ class YouTubeCollector(BaseCollector):
             try:
                 self.logger.info(f"Searching for: {query}")
                 
-                # Search for videos
-                search_response = self.youtube.search().list(
-                    q=query,
-                    part='id,snippet',
-                    maxResults=limit,
-                    order='relevance',
-                    type='video',
-                    publishedAfter=(datetime.now() - timedelta(days=30)).isoformat() + 'Z'
-                ).execute()
+                collected = 0
+                next_page_token = None
                 
-                video_ids = [item['id']['videoId'] for item in search_response['items']]
-                
-                # Get video details
-                videos_response = self.youtube.videos().list(
-                    part='snippet,statistics',
-                    id=','.join(video_ids)
-                ).execute()
-                
-                for video in videos_response['items']:
-                    # Collect video data
-                    video_data = self.normalize_item({
-                        'id': video['id'],
-                        'title': video['snippet']['title'],
-                        'description': video['snippet'].get('description', ''),
-                        'author': video['snippet']['channelTitle'],
-                        'channel': video['snippet']['channelTitle'],
-                        'channel_id': video['snippet']['channelId'],
-                        'published_at': video['snippet']['publishedAt'],
-                        'view_count': video['statistics'].get('viewCount', 0),
-                        'like_count': video['statistics'].get('likeCount', 0),
-                        'comment_count': video['statistics'].get('commentCount', 0),
-                        'type': 'video'
-                    })
+                while collected < limit:
+                    page_size = min(50, limit - collected)
                     
-                    if self.validate_item(video_data):
-                        all_data.append(video_data)
+                    # Search for videos
+                    search_params = {
+                        'q': query,
+                        'part': 'id,snippet',
+                        'maxResults': page_size,
+                        'order': 'relevance',
+                        'type': 'video',
+                        'publishedAfter': (datetime.now() - timedelta(days=30)).isoformat() + 'Z'
+                    }
+                    if next_page_token:
+                        search_params['pageToken'] = next_page_token
                     
-                    # Collect comments for this video
-                    comments = await self.collect_comments(video['id'], limit=20)
-                    all_data.extend(comments)
+                    search_response = self.youtube.search().list(**search_params).execute()
+                    
+                    video_ids = [item['id']['videoId'] for item in search_response['items']]
+                    if not video_ids:
+                        break
+                    
+                    # Get video details
+                    videos_response = self.youtube.videos().list(
+                        part='snippet,statistics',
+                        id=','.join(video_ids)
+                    ).execute()
+                    
+                    for video in videos_response['items']:
+                        # Collect video data
+                        video_data = self.normalize_item({
+                            'id': video['id'],
+                            'title': video['snippet']['title'],
+                            'description': video['snippet'].get('description', ''),
+                            'author': video['snippet']['channelTitle'],
+                            'channel': video['snippet']['channelTitle'],
+                            'channel_id': video['snippet']['channelId'],
+                            'published_at': video['snippet']['publishedAt'],
+                            'view_count': video['statistics'].get('viewCount', 0),
+                            'like_count': video['statistics'].get('likeCount', 0),
+                            'comment_count': video['statistics'].get('commentCount', 0),
+                            'type': 'video'
+                        })
+                        
+                        if self.validate_item(video_data):
+                            all_data.append(video_data)
+                        
+                        # Collect comments for this video
+                        comments = await self.collect_comments(video['id'], limit=15)
+                        all_data.extend(comments)
+                    
+                    collected += len(videos_response['items'])
+                    next_page_token = search_response.get('nextPageToken')
+                    if not next_page_token:
+                        break
                 
                 # Update rate limit info (YouTube has daily quota)
                 self.rate_limit_remaining = 10000  # Default daily quota

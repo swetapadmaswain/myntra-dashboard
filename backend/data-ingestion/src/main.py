@@ -56,7 +56,7 @@ async def enrich_and_store(items: list, batch_size: int = 50) -> int:
     collection = _mongo_db["raw_conversations"]
     stored_count = 0
 
-    async with httpx.AsyncClient(timeout=300.0) as client:
+    async with httpx.AsyncClient(timeout=900.0) as client:
         for i in range(0, len(items), batch_size):
             chunk = items[i:i + batch_size]
 
@@ -364,17 +364,19 @@ async def ingest_youtube_manual(background_tasks: BackgroundTasks, limit: int = 
         # Deduplicate
         unique_items = deduplicator.deduplicate_batch(items)
         
-        # Enrich with NLP predictions and persist to MongoDB
-        stored = await enrich_and_store(unique_items)
+        # Enrich with NLP predictions and persist to MongoDB in the background
+        # so the API returns immediately while the slow NLP service runs
+        background_tasks.add_task(enrich_and_store, unique_items)
         
-        logger.info(f"Manual YouTube ingestion completed: {len(unique_items)} unique items, {stored} stored")
+        logger.info(f"Manual YouTube ingestion started: {len(unique_items)} unique items queued for background processing")
         
         return {
-            "status": "success",
+            "status": "processing",
             "collected": len(items),
             "unique": len(unique_items),
             "duplicates": len(items) - len(unique_items),
-            "stored": stored,
+            "stored": 0,
+            "queued_for_processing": len(unique_items),
             "timestamp": datetime.now().isoformat()
         }
         
