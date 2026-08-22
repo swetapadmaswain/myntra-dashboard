@@ -1,0 +1,269 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: myntra-postgres
+    environment:
+      POSTGRES_DB: myntra_dashboard
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - myntra-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-myntra_user} -d myntra_dashboard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: myntra-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER:-myntra_user}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: myntra_dashboard
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - myntra-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: myntra-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - myntra-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # API Gateway (Node.js/Express)
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: myntra-api-gateway
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: myntra_dashboard
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_DB: myntra_dashboard
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NLP_SERVICE_URL: http://nlp-service:8000
+      ANALYTICS_SERVICE_URL: http://analytics-service:8001
+      DATA_INGESTION_SERVICE_URL: http://data-ingestion:8002
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # Data Ingestion Service (Python/FastAPI)
+  data-ingestion:
+    build:
+      context: ./backend/data-ingestion
+      dockerfile: Dockerfile
+    container_name: myntra-data-ingestion
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: myntra_dashboard
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_DB: myntra_dashboard
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      NLP_SERVICE_URL: http://nlp-service:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # NLP Processing Service (Python/FastAPI)
+  nlp-service:
+    build:
+      context: ./backend/nlp-service
+      dockerfile: Dockerfile
+    container_name: myntra-nlp-service
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: myntra_dashboard
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_DB: myntra_dashboard
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+
+  # Analytics & Aggregation Service (Python/FastAPI)
+  analytics-service:
+    build:
+      context: ./backend/analytics-service
+      dockerfile: Dockerfile
+    container_name: myntra-analytics-service
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: myntra_dashboard
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_DB: myntra_dashboard
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        API_GATEWAY_URL: http://api-gateway:3000/api/v1
+        NEXT_PUBLIC_API_URL: /api/v1
+    container_name: myntra-frontend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      - api-gateway
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # Caddy reverse proxy with automatic HTTPS
+  caddy:
+    image: caddy:2-alpine
+    container_name: myntra-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      DOMAIN: ${DOMAIN}
+    depends_on:
+      - frontend
+      - api-gateway
+    networks:
+      - myntra-network
+    restart: unless-stopped
+
+networks:
+  myntra-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+  caddy_data:
+  caddy_config:
