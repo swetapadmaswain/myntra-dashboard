@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     postgres_db: str = "myntra_dashboard"
     postgres_user: str = "myntra_user"
     postgres_password: str = "myntra_password"
+    postgres_sslmode: str = "prefer"
     
     # MongoDB
     mongodb_host: str = "localhost"

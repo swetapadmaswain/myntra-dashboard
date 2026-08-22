@@ -1,11 +1,13 @@
-# Myntra Dashboard - Vercel + Free Oracle Cloud Deployment Plan
+# Myntra Dashboard - Vercel + Free Oracle Cloud + Supabase Deployment Plan
 
 ## Goal
-Deploy the Next.js frontend on Vercel (free hobby tier) and the backend services on Oracle Cloud's Always Free tier.
+Deploy the Next.js frontend on Vercel (free), the backend services on Oracle Cloud (free), and PostgreSQL on Supabase (free tier).
 
 ## Tooling (all free)
 - **Frontend:** Vercel hobby plan
 - **Backend VM:** Oracle Cloud `VM.Standard.A1.Flex` (up to 4 OCPUs and 24 GB RAM, always free)
+- **PostgreSQL:** Supabase free tier
+- **MongoDB / Redis:** self-hosted on the Oracle VM
 - **DNS:** Cloudflare free plan
 - **Backend SSL:** Caddy with automatic Let's Encrypt
 - **Container runtime:** Docker + Docker Compose
@@ -14,12 +16,28 @@ Deploy the Next.js frontend on Vercel (free hobby tier) and the backend services
 1. A GitHub repository at `https://github.com/swetapadmaswain/myntra-dashboard`.
 2. A Vercel account linked to GitHub.
 3. An Oracle Cloud account with a free trial.
-4. A domain you control.
-5. A YouTube Data API v3 key.
+4. A Supabase account.
+5. A domain you control.
+6. A YouTube Data API v3 key.
 
 ---
 
-## Step 1 - Provision the free backend server
+## Step 1 - Set up Supabase PostgreSQL
+
+1. Open https://supabase.com and create a new project.
+2. Pick a region close to your Oracle VM.
+3. In **Project Settings > Database**, copy the **Connection string > URI** value. It looks like:
+   `postgresql://postgres:<password>@db.<id>.supabase.co:5432/postgres`
+4. Note these values:
+   - `POSTGRES_HOST` = `db.<id>.supabase.co`
+   - `POSTGRES_PORT` = `5432`
+   - `POSTGRES_DB` = `postgres`
+   - `POSTGRES_USER` = `postgres`
+   - `POSTGRES_PASSWORD` = your project password
+
+---
+
+## Step 2 - Provision the free backend server
 
 1. Sign in at https://cloud.oracle.com and go to **Compute > Instances**.
 2. Click **Create Instance**.
@@ -34,18 +52,16 @@ Deploy the Next.js frontend on Vercel (free hobby tier) and the backend services
 
 ---
 
-## Step 2 - Configure DNS
-
-Use a subdomain for the API and the main (or another) domain for Vercel.
+## Step 3 - Configure DNS
 
 1. In Cloudflare, add:
    - `A` record for `api.example.com` → Oracle Cloud public IP
-   - `CNAME` record for `app.example.com` → `cname.vercel-dns.com` (or use Vercel's auto-assigned domain for now)
+   - `CNAME` record for `app.example.com` → `cname.vercel-dns.com` (or use the Vercel default URL)
 2. If you don't want a custom domain on Vercel, you can use the default `*.vercel.app` URL.
 
 ---
 
-## Step 3 - Prepare the Oracle server
+## Step 4 - Prepare the Oracle server
 
 SSH in and install Docker:
 
@@ -67,18 +83,20 @@ git checkout develop
 
 ---
 
-## Step 4 - Configure backend environment
+## Step 5 - Configure the environment
 
 ```bash
 cp .env.prod.example .env
 nano .env
 ```
 
-Fill in at least:
+Fill in:
+
 - `API_DOMAIN` (e.g. `api.example.com`)
-- `POSTGRES_PASSWORD`
-- `MONGODB_PASSWORD`
-- `JWT_SECRET`
+- `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` (from Supabase)
+- `POSTGRES_SSLMODE` = `require`
+- `MONGODB_PASSWORD` (strong random value for the local MongoDB container)
+- `JWT_SECRET` (strong random value)
 - `YOUTUBE_API_KEY`
 - `CORS_ORIGINS` = your Vercel frontend URL, e.g. `https://myntra-dashboard.vercel.app,https://app.example.com`
 
@@ -86,27 +104,27 @@ Save and exit.
 
 ---
 
-## Step 5 - Deploy the backend
+## Step 6 - Deploy the backend
 
 ```bash
 ./deploy-backend.sh
 ```
 
-This builds and starts the API, databases, NLP, analytics, and data ingestion services on the Oracle VM.
+This builds and starts the API, NLP, analytics, data ingestion, MongoDB, and Redis services on the Oracle VM. PostgreSQL is provided by Supabase.
 
 ---
 
-## Step 6 - Deploy the frontend on Vercel
+## Step 7 - Deploy the frontend on Vercel
 
 1. Go to https://vercel.com and click **Add New... > Project**.
 2. Import `swetapadmaswain/myntra-dashboard` and select the `develop` branch.
 3. Set **Root Directory** to `frontend`.
-4. Add environment variable `NEXT_PUBLIC_API_URL` = `https://api.example.com/api/v1`.
+4. Add the environment variable `NEXT_PUBLIC_API_URL` = `https://api.example.com/api/v1`.
 5. Click **Deploy**.
 
 ---
 
-## Step 7 - Verify
+## Step 8 - Verify
 
 ```bash
 docker compose -f docker-compose.backend.yml ps
@@ -117,7 +135,7 @@ Open the Vercel production URL. The dashboard should load and call the Oracle ba
 
 ---
 
-## Step 8 - Trigger initial YouTube ingestion
+## Step 9 - Trigger initial YouTube ingestion
 
 ```bash
 docker compose -f docker-compose.backend.yml exec data-ingestion \
@@ -127,5 +145,5 @@ docker compose -f docker-compose.backend.yml exec data-ingestion \
 ---
 
 ## Notes
-- The Oracle A1 shape is free and has enough RAM (24 GB) to run the whole backend stack, including the NLP model.
-- If you get CORS errors, update `CORS_ORIGINS` in `.env` and re-run `./deploy-backend.sh`.
+- Supabase's free PostgreSQL has a 500 MB limit. The raw MongoDB data and analytics cache live on the Oracle VM, so Postgres is mainly for metadata and analytics tables.
+- If you hit the Supabase 500 MB limit, you can either upgrade Supabase or move Postgres back to the Oracle VM (`docker-compose.prod.yml`).

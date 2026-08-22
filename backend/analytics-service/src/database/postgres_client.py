@@ -33,7 +33,8 @@ class PostgreSQLClient:
                 port=settings.postgres_port,
                 database=settings.postgres_db,
                 user=settings.postgres_user,
-                password=settings.postgres_password
+                password=settings.postgres_password,
+                sslmode=settings.postgres_sslmode
             )
             logger.info("PostgreSQL connection pool initialized")
         except Exception as e:
