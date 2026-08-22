@@ -4,6 +4,7 @@ Uses Pydantic for type-safe configuration management
 """
 
 from pydantic_settings import BaseSettings
+from pydantic import validator
 from typing import Optional
 
 
@@ -50,6 +51,13 @@ class Settings(BaseSettings):
 
     # NLP Service
     nlp_service_url: str = "http://localhost:8000"
+
+    @validator('nlp_service_url')
+    @classmethod
+    def _normalize_nlp_service_url(cls, v: str) -> str:
+        if not v.startswith(('http://', 'https://')):
+            return f'https://{v}'
+        return v
     
     # Rate Limiting
     reddit_rate_limit: int = 60  # requests per minute

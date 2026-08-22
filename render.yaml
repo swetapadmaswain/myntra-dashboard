@@ -115,7 +115,7 @@ services:
         fromService:
           type: web
           name: myntra-nlp-service
-          property: url
+          property: host
     healthCheckPath: /health
 
   - type: web
@@ -160,15 +160,15 @@ services:
         fromService:
           type: web
           name: myntra-nlp-service
-          property: url
+          property: host
       - key: ANALYTICS_SERVICE_URL
         fromService:
           type: web
           name: myntra-analytics-service
-          property: url
+          property: host
       - key: DATA_INGESTION_SERVICE_URL
         fromService:
           type: web
           name: myntra-data-ingestion
-          property: url
+          property: host
     healthCheckPath: /health

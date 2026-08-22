@@ -7,6 +7,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function normalizeServiceUrl(url: string | undefined, defaultUrl: string): string {
+  const value = url || defaultUrl;
+  if (!value.startsWith('http://') && !value.startsWith('https://')) {
+    return `https://${value}`;
+  }
+  return value;
+}
+
 export const settings = {
   // Application
   appName: 'API Gateway',
@@ -26,9 +34,9 @@ export const settings = {
   redisPassword: process.env.REDIS_PASSWORD || undefined,
 
   // Downstream services
-  nlpServiceUrl: process.env.NLP_SERVICE_URL || 'http://localhost:8000',
-  analyticsServiceUrl: process.env.ANALYTICS_SERVICE_URL || 'http://localhost:8001',
-  dataIngestionServiceUrl: process.env.DATA_INGESTION_SERVICE_URL || 'http://localhost:8002',
+  nlpServiceUrl: normalizeServiceUrl(process.env.NLP_SERVICE_URL, 'http://localhost:8000'),
+  analyticsServiceUrl: normalizeServiceUrl(process.env.ANALYTICS_SERVICE_URL, 'http://localhost:8001'),
+  dataIngestionServiceUrl: normalizeServiceUrl(process.env.DATA_INGESTION_SERVICE_URL, 'http://localhost:8002'),
 
   // Rate limiting
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
