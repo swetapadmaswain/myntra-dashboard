@@ -20,13 +20,14 @@ logger = logging.getLogger(__name__)
 class FrictionAnalyzer:
     """Friction breakdown analyzer"""
     
-    FRICTION_TYPES = ['fit_sizing', 'styling_wardrobe', 'social_validation', 'visual_reality', 'price_value']
+    FRICTION_TYPES = ['fit_sizing', 'styling_wardrobe', 'social_validation', 'visual_reality', 'price_value', 'wishlist_styling']
     FRICTION_COLORS = {
         'fit_sizing': '#ff3f6c',
         'styling_wardrobe': '#ff905a',
         'social_validation': '#282c3f',
         'visual_reality': '#535766',
-        'price_value': '#eaeaec'
+        'price_value': '#eaeaec',
+        'wishlist_styling': '#9333ea'
     }
     
     def __init__(self):

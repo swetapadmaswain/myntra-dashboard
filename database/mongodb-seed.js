@@ -172,6 +172,92 @@ db.raw_conversations.insertMany([
     replies: 15,
     processed: true,
     createdAt: new Date()
+  },
+  {
+    text: 'I added this jacket to my wishlist but I have no idea how to style it for an evening out. Outfit tips would help so much.',
+    source: 'appstore',
+    sentiment: 'neutral',
+    hesitation_driver: 'wishlist_styling',
+    entities: [
+      { text: 'jacket', label: 'CATEGORY', confidence: 0.91 },
+      { text: 'evening', label: 'OCCASION', confidence: 0.85 }
+    ],
+    metadata: {
+      app_version: '4.2.1',
+      device: 'iPhone 14',
+      rating: 3
+    },
+    timestamp: new Date('2024-01-15T17:00:00Z'),
+    author: 'user606',
+    source_url: 'https://apps.apple.com/app/reviews',
+    upvotes: 0,
+    replies: 0,
+    processed: true,
+    createdAt: new Date()
+  },
+  {
+    text: 'Wishlisted these jeans but not sure what top to pair them with. Need styling inspiration before I buy.',
+    source: 'reddit',
+    sentiment: 'neutral',
+    hesitation_driver: 'wishlist_styling',
+    entities: [
+      { text: 'jeans', label: 'CATEGORY', confidence: 0.93 },
+      { text: 'top', label: 'CATEGORY', confidence: 0.88 }
+    ],
+    metadata: {
+      subreddit: 'r/IndianFashionAddicts',
+      upvotes: 28
+    },
+    timestamp: new Date('2024-01-15T17:30:00Z'),
+    author: 'user707',
+    source_url: 'https://reddit.com/r/IndianFashionAddicts/comments/mno345',
+    upvotes: 28,
+    replies: 9,
+    processed: true,
+    createdAt: new Date()
+  },
+  {
+    text: 'I keep saving items to my wishlist but I never know how to actually wear them. Would love lookbook suggestions.',
+    source: 'youtube',
+    sentiment: 'neutral',
+    hesitation_driver: 'wishlist_styling',
+    entities: [
+      { text: 'lookbook', label: 'CATEGORY', confidence: 0.87 }
+    ],
+    metadata: {
+      video_id: 'def789',
+      video_title: 'Myntra Wishlist Woes',
+      channel: 'StyleDiaries'
+    },
+    timestamp: new Date('2024-01-15T18:00:00Z'),
+    author: 'user808',
+    source_url: 'https://youtube.com/watch?v=def789',
+    upvotes: 150,
+    replies: 42,
+    processed: true,
+    createdAt: new Date()
+  },
+  {
+    text: 'There is this dress in my wishlist but I do not know what accessories or shoes will go with it. Styling guidance missing.',
+    source: 'appstore',
+    sentiment: 'negative',
+    hesitation_driver: 'wishlist_styling',
+    entities: [
+      { text: 'dress', label: 'CATEGORY', confidence: 0.95 },
+      { text: 'accessories', label: 'CATEGORY', confidence: 0.86 }
+    ],
+    metadata: {
+      app_version: '4.2.0',
+      device: 'Samsung Galaxy S23',
+      rating: 2
+    },
+    timestamp: new Date('2024-01-15T17:20:00Z'),
+    author: 'user909',
+    source_url: 'https://apps.apple.com/app/reviews',
+    upvotes: 0,
+    replies: 0,
+    processed: true,
+    createdAt: new Date()
   }
 ]);
 

@@ -6,27 +6,12 @@ interface FrictionBarChartProps {
 }
 
 const defaultColors: Record<string, string> = {
-  'Fit / Sizing': '#ff3f6c',
-  'Styling / Wardrobe': '#ff905a',
+  'Fit Sizing': '#ff3f6c',
+  'Styling Wardrobe': '#ff905a',
   'Social Validation': '#282c3f',
-  'Visual / Reality': '#535766',
-  'Price / Value': '#3b82f6',
-};
-
-const problemMap: Record<string, string> = {
-  'Fit / Sizing': 'Shoppers are unsure if the product will fit or look right',
-  'Styling / Wardrobe': "Shoppers don't know how to style the wishlist item into a complete outfit",
-  'Visual / Reality': 'Product visuals do not match real-world expectations',
-  'Social Validation': 'Shoppers lack trusted opinions or social proof',
-  'Price / Value': 'Shoppers are not convinced the price matches the value',
-};
-
-const solutionMap: Record<string, string> = {
-  'Fit / Sizing': 'Enhanced size guides & virtual try-on',
-  'Styling / Wardrobe': 'Wishlist Style Studio — create full outfits from wishlist products',
-  'Visual / Reality': 'AR product previews & user photos',
-  'Social Validation': 'UGC reviews & social proof badges',
-  'Price / Value': 'Price drop alerts & value comparisons',
+  'Visual Reality': '#535766',
+  'Price Value': '#3b82f6',
+  'Wishlist Styling': '#9333ea',
 };
 
 export function FrictionBarChart({ data }: FrictionBarChartProps) {
@@ -41,12 +26,10 @@ export function FrictionBarChart({ data }: FrictionBarChartProps) {
   const sorted = [...data].sort((a, b) => b.count - a.count);
   const total = sorted.reduce((sum, d) => sum + d.count, 0);
   const top = sorted[0];
-  const topProblem = problemMap[top.name] ?? 'Top friction is reducing purchase confidence';
-  const topSolution = solutionMap[top.name] ?? 'Address the dominant friction directly';
 
   return (
     <div>
-      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div className="rounded-lg bg-myntra-gray p-3">
           <div className="text-xs text-myntra-text-light">Total friction signals</div>
           <div className="text-xl font-semibold text-myntra-text-dark">{total}</div>
@@ -55,13 +38,9 @@ export function FrictionBarChart({ data }: FrictionBarChartProps) {
           <div className="text-xs text-myntra-text-light">Dominant friction</div>
           <div className="text-lg font-semibold text-myntra-text-dark">{top.name}</div>
         </div>
-        <div className="rounded-lg bg-myntra-pink/10 p-3">
-          <div className="text-xs text-myntra-pink">Top problem</div>
-          <div className="text-sm font-semibold leading-snug text-myntra-pink">{topProblem}</div>
-        </div>
-        <div className="rounded-lg bg-myntra-pink/10 p-3">
-          <div className="text-xs text-myntra-pink">Proposed solution</div>
-          <div className="text-sm font-semibold leading-snug text-myntra-pink">{topSolution}</div>
+        <div className="rounded-lg bg-myntra-gray p-3">
+          <div className="text-xs text-myntra-text-light">Dominant share</div>
+          <div className="text-xl font-semibold text-myntra-text-dark">{top.percentage?.toFixed(1) ?? ((top.count / total) * 100).toFixed(1)}%</div>
         </div>
       </div>
 
