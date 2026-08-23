@@ -29,13 +29,13 @@ celery_app.conf.beat_schedule = {
         'task': 'tasks.scheduled_tasks.ingest_reddit',
         'schedule': crontab(minute='*/15'),
     },
-    'ingest-appstore-every-hour': {
+    'ingest-appstore-every-6-hours': {
         'task': 'tasks.scheduled_tasks.ingest_appstore',
-        'schedule': crontab(minute=0),
-    },
-    'ingest-youtube-every-6-hours': {
-        'task': 'tasks.scheduled_tasks.ingest_youtube',
         'schedule': crontab(hour='*/6', minute=0),
+    },
+    'ingest-youtube-every-12-hours': {
+        'task': 'tasks.scheduled_tasks.ingest_youtube',
+        'schedule': crontab(hour='*/12', minute=30),
     },
 }
 
@@ -147,7 +147,7 @@ def ingest_appstore(self):
         collector = AppStoreCollector()
         deduplicator = Deduplicator()
         
-        items = asyncio.run(collector.collect(limit=100))
+        items = asyncio.run(collector.collect(limit=50))
         unique_items = deduplicator.deduplicate_batch(items)
         
         stored = asyncio.run(_enrich_and_store(unique_items))
@@ -178,7 +178,7 @@ def ingest_youtube(self):
         collector = YouTubeCollector()
         deduplicator = Deduplicator()
         
-        items = asyncio.run(collector.collect(limit=50))
+        items = asyncio.run(collector.collect(limit=20))
         unique_items = deduplicator.deduplicate_batch(items)
         
         stored = asyncio.run(_enrich_and_store(unique_items))
