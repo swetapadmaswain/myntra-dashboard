@@ -21,20 +21,20 @@ export function ArchitectureDiagram() {
             Git Repo
           </a>
           <a
-            href="http://localhost:8002/docs"
+            href="https://132.226.186.155.nip.io/api/v1/health"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-xl border-2 border-myntra-pink/30 px-4 py-2 text-xs font-semibold text-myntra-pink transition hover:bg-myntra-pink/5"
           >
-            Ingestion API
+            Live API
           </a>
           <a
-            href="http://localhost:8001/docs"
+            href="https://myntra-dashboard-iota.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-xl border-2 border-myntra-orange/30 px-4 py-2 text-xs font-semibold text-myntra-orange transition hover:bg-myntra-orange/5"
           >
-            Analytics API
+            Live Dashboard
           </a>
         </div>
       </div>
@@ -96,33 +96,35 @@ export function ArchitectureDiagram() {
 
         {/* Layer 4: API Gateway & Frontend */}
         <div>
-          <LayerHeader number="4" title="API Gateway & Frontend" desc="Express proxy → Next.js dashboard → Browser" />
+          <LayerHeader number="4" title="API Gateway & Frontend" desc="Caddy SSL proxy → Express API → Vercel Next.js → Browser" />
           <div className="flex min-w-max items-center gap-2 overflow-x-auto pb-2">
             <ArchNode title="Analytics Service" desc="FastAPI · :8001" color="from-orange-500 to-amber-500" />
             <Arrow label="/analytics/*" />
             <ArchNode title="API Gateway" desc="Express · Helmet · CORS · :3000" color="from-rose-500 to-pink-500" />
-            <Arrow label="/api/v1/*" />
-            <ArchNode title="Next.js 14" desc="React · TypeScript · :3001" color="from-myntra-pink to-myntra-orange" />
+            <Arrow label="proxy" />
+            <ArchNode title="Caddy" desc="SSL · nip.io · :443" color="from-teal-500 to-cyan-500" />
+            <Arrow label="HTTPS" />
+            <ArchNode title="Vercel" desc="Next.js 14 · SSR" color="from-myntra-pink to-myntra-orange" />
             <Arrow label="render" />
-            <ArchNode title="Dashboard UI" desc="9 tabs · Recharts · Zustand" color="from-myntra-neon-pink to-myntra-purple" />
-            <Arrow label="display" />
             <ArchNode title="Browser" desc="User-facing dashboard" color="from-cyan-500 to-blue-500" />
           </div>
         </div>
 
         {/* Layer 5: Scheduling & Infrastructure */}
         <div>
-          <LayerHeader number="5" title="Scheduling & Infrastructure" desc="Celery Beat periodic tasks · Docker Compose orchestration" />
+          <LayerHeader number="5" title="Scheduling & Infrastructure" desc="Celery Beat periodic tasks · Docker Compose · Oracle Cloud hosting" />
           <div className="flex min-w-max items-center gap-2 overflow-x-auto pb-2">
             <ArchNode title="Celery Beat" desc="Periodic scheduler" color="from-amber-500 to-orange-500" />
             <Arrow label="trigger" />
-            <ArchNode title="Ingestion Tasks" desc="App Store · YouTube · Reddit" color="from-indigo-500 to-purple-500" />
+            <ArchNode title="Ingestion Tasks" desc="App Store · YouTube" color="from-indigo-500 to-purple-500" />
             <Arrow label="dedupe" />
-            <ArchNode title="Deduplicator" desc="Content hash + URL" color="from-blue-500 to-cyan-500" />
+            <ArchNode title="Deduplicator" desc="Hash + URL + DB check" color="from-blue-500 to-cyan-500" />
             <Arrow label="enrich+store" />
             <ArchNode title="MongoDB" desc="Growing continuously" color="from-emerald-500 to-green-500" />
             <Arrow label="orchestrate" />
-            <ArchNode title="Docker Compose" desc="9 containers · 1 network" color="from-sky-500 to-blue-500" />
+            <ArchNode title="Docker Compose" desc="11 containers · 1 network" color="from-sky-500 to-blue-500" />
+            <Arrow label="hosted on" />
+            <ArchNode title="Oracle Cloud" desc="Always Free ARM · 5.8GB RAM" color="from-red-500 to-orange-500" />
           </div>
         </div>
       </div>
@@ -132,7 +134,7 @@ export function ArchitectureDiagram() {
         <StackCard title="Ingestion" items={['Python 3.11', 'FastAPI', 'httpx (Reddit)', 'YouTube Data API v3', 'google-play-scraper', 'Celery Beat']} />
         <StackCard title="NLP Processing" items={['spaCy NLP', 'VADER Sentiment', 'Custom intent classifier', 'Hesitation driver model', 'NER entity extraction']} />
         <StackCard title="Analytics" items={['FastAPI · :8001', 'KPI Calculator', 'Friction Analyzer', 'Journey Analyzer', 'Behavioural Analyzer', 'Redis caching']} />
-        <StackCard title="Infrastructure" items={['MongoDB 7', 'PostgreSQL 15', 'Elasticsearch 8', 'Redis 7', 'Docker Compose', '9 containers']} />
+        <StackCard title="Infrastructure" items={['MongoDB 7', 'PostgreSQL 15', 'Redis 7', 'Docker Compose', '11 containers', 'Oracle Cloud Always Free']} />
       </div>
 
       {/* Frontend Stack */}
@@ -140,7 +142,7 @@ export function ArchitectureDiagram() {
         <StackCard title="Frontend" items={['Next.js 14', 'TypeScript', 'Tailwind CSS', 'Recharts', 'Zustand', 'TanStack Query']} />
         <StackCard title="API Gateway" items={['Node.js · Express', 'Helmet security', 'CORS enabled', 'Redis caching', 'Swagger docs', 'Rate limiting']} />
         <StackCard title="Data Sources" items={['Google Play Store', 'Apple App Store', 'YouTube Comments', 'Reddit (public API)']} />
-        <StackCard title="DevOps" items={['Docker Compose', 'GitHub Actions CI', '9-service network', 'Volume persistence', 'Health checks']} />
+        <StackCard title="DevOps" items={['Oracle Cloud ARM VM', 'Caddy + nip.io SSL', 'Vercel frontend', 'GitHub Actions CI', 'Keep-alive cron', 'Auto-restart containers']} />
       </div>
     </div>
   );
