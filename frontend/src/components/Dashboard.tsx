@@ -134,64 +134,77 @@ export function Dashboard() {
 
   if (!mounted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-myntra-gray">
-        <p className="text-myntra-text-light">Loading dashboard...</p>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-pulse text-center">
+          <div className="mb-3 h-12 w-12 mx-auto rounded-full bg-gradient-to-br from-myntra-pink to-myntra-orange animate-glow" />
+          <p className="text-lg font-semibold bg-gradient-to-r from-myntra-pink to-myntra-orange bg-clip-text text-transparent">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-myntra-gray p-4 md:p-6 lg:p-8">
-      <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-myntra-text-dark">Wishlist AI Dashboard</h1>
-          <p className="text-sm text-myntra-text-light">Discover why people hesitate to buy from their wishlist</p>
+    <div className="min-h-screen p-4 md:p-6 lg:p-8">
+      {/* Gradient header banner */}
+      <header className="mb-6 rounded-2xl bg-gradient-to-r from-myntra-pink via-myntra-neon-pink to-myntra-orange p-6 shadow-lg animate-fade-in">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white md:text-3xl">Wishlist AI Dashboard</h1>
+            <p className="text-sm text-white/90 mt-1">Discover why people hesitate to buy from their wishlist</p>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2 backdrop-blur-sm">
+            <span className="h-2.5 w-2.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-sm font-medium text-white">Live Data</span>
+          </div>
         </div>
       </header>
 
       {metricsLoading ? (
-        <div className="mb-6 rounded-xl bg-white p-8 text-center shadow-sm">Loading KPIs...</div>
+        <div className="mb-6 rounded-xl bg-white p-8 text-center shadow-md animate-shimmer">
+          <p className="text-sm font-medium text-myntra-pink">Loading KPIs...</p>
+        </div>
       ) : (
-        <div className="mb-6">
+        <div className="mb-6 animate-fade-in">
           <KPICards metrics={metrics || {}} />
         </div>
       )}
 
       {metricsError && (
-        <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700 shadow-sm">
+        <div className="mb-6 rounded-xl bg-red-50 p-4 text-sm text-red-700 shadow-sm border-l-4 border-red-500">
           Failed to load KPIs. Check the API Gateway and browser console.
         </div>
       )}
 
+      {/* Filter bar with vibrant styling */}
       <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-4">
         <select
-          className="rounded-lg border border-myntra-gray-2 bg-white px-3 py-2 text-sm"
+          className="rounded-xl border-2 border-myntra-pink/20 bg-white px-3 py-2.5 text-sm font-medium text-myntra-text-dark shadow-sm transition hover:border-myntra-pink/50 focus:border-myntra-pink focus:outline-none focus:ring-2 focus:ring-myntra-pink/20"
           value={filters.source || ''}
           onChange={(e) => setFilter('source', e.target.value || null)}
         >
-          <option value="">All sources</option>
+          <option value="">All Sources</option>
           <option value="appstore">App/Play Store</option>
           <option value="youtube">YouTube</option>
           <option value="reddit">Reddit</option>
         </select>
 
         <select
-          className="rounded-lg border border-myntra-gray-2 bg-white px-3 py-2 text-sm"
+          className="rounded-xl border-2 border-myntra-orange/20 bg-white px-3 py-2.5 text-sm font-medium text-myntra-text-dark shadow-sm transition hover:border-myntra-orange/50 focus:border-myntra-orange focus:outline-none focus:ring-2 focus:ring-myntra-orange/20"
           value={filters.sentiment || ''}
           onChange={(e) => setFilter('sentiment', e.target.value || null)}
         >
-          <option value="">All sentiments</option>
+          <option value="">All Sentiments</option>
           <option value="positive">Positive</option>
           <option value="neutral">Neutral</option>
           <option value="negative">Negative</option>
         </select>
 
         <select
-          className="rounded-lg border border-myntra-gray-2 bg-white px-3 py-2 text-sm"
+          className="rounded-xl border-2 border-myntra-purple/20 bg-white px-3 py-2.5 text-sm font-medium text-myntra-text-dark shadow-sm transition hover:border-myntra-purple/50 focus:border-myntra-purple focus:outline-none focus:ring-2 focus:ring-myntra-purple/20"
           value={filters.hesitation_driver || ''}
           onChange={(e) => setFilter('hesitation_driver', e.target.value || null)}
         >
-          <option value="">All drivers</option>
+          <option value="">All Drivers</option>
           <option value="fit_sizing">Fit / Sizing</option>
           <option value="visual_reality">Visual / Reality</option>
           <option value="price_value">Price / Value</option>
@@ -201,9 +214,9 @@ export function Dashboard() {
 
         <button
           onClick={resetFilters}
-          className="rounded-lg border border-myntra-pink px-3 py-2 text-sm font-medium text-myntra-pink hover:bg-myntra-pink hover:text-white"
+          className="rounded-xl bg-gradient-to-r from-myntra-pink to-myntra-orange px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
         >
-          Reset
+          Reset Filters
         </button>
       </div>
 
@@ -211,7 +224,7 @@ export function Dashboard() {
 
       {/* Full-width tabs: segments, insights, architecture */}
       {(tab === 'segments' || tab === 'insights' || tab === 'architecture') && (
-        <main className="mt-6">
+        <main className="mt-6 animate-fade-in">
           {tab === 'segments' && <SegmentsPanel metrics={typedMetrics} />}
           {tab === 'insights' && <InsightsPanel metrics={typedMetrics} frictionData={frictionData} opportunityData={opportunityData} />}
           {tab === 'architecture' && <ArchitectureDiagram />}
@@ -220,9 +233,10 @@ export function Dashboard() {
 
       {/* Standard full-width layout tabs */}
       {tab !== 'segments' && tab !== 'insights' && tab !== 'architecture' && (
-      <main className="mt-6">
-        <div className="rounded-xl bg-white p-4 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-myntra-text-dark">
+      <main className="mt-6 animate-fade-in">
+        <div className="rounded-2xl bg-white p-6 shadow-md border-t-4 border-myntra-pink">
+          <h2 className="mb-4 text-xl font-bold text-myntra-text-dark flex items-center gap-2">
+            <span className="inline-block h-5 w-1.5 rounded-full bg-gradient-to-b from-myntra-pink to-myntra-orange" />
             {tab === 'friction' && 'Friction Breakdown'}
             {tab === 'intent' && 'Intent Matrix'}
             {tab === 'journey' && 'Journey Tracker'}

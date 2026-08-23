@@ -252,10 +252,22 @@ export function ChatBot({ metrics }: ChatBotProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex h-12 items-center gap-2 rounded-full bg-myntra-pink px-4 text-white shadow-xl transition hover:scale-105 hover:bg-myntra-pink-dark"
+        className="group flex h-14 items-center gap-2.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 px-6 text-white shadow-xl shadow-blue-500/40 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 active:scale-95 animate-glow"
         aria-label={open ? 'Close chat' : 'Open chat'}
       >
-        <span className="text-sm font-semibold">Ask AI</span>
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2.5}
+            stroke="currentColor"
+            className="h-4 w-4"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 1-3.09-3.146L2.25 12l1.846-.708a4.5 4.5 0 0 1 3.146-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 1 3.09 3.146L14.75 12l-1.846.708a4.5 4.5 0 0 1-3.146 3.09Z" />
+          </svg>
+        </span>
+        <span className="text-base font-bold tracking-wide">Ask AI</span>
         {open ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"

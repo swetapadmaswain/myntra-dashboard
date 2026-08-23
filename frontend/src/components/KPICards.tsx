@@ -37,25 +37,38 @@ export function KPICards({ metrics }: KPICardsProps) {
     : '—';
 
   const cards = [
-    { label: 'Total Snippets', value: metrics.total_signals ?? 0, sub: 'Analyzed conversations' },
-    { label: 'Avg Sentiment', value: avgSentiment, sub: 'Net sentiment score' },
-    { label: 'Top Friction', value: topFriction, sub: 'Why people hold back' },
-    { label: 'Top Intent', value: topIntent, sub: 'Dominant buyer intent' },
+    { label: 'Total Snippets', value: metrics.total_signals ?? 0, sub: 'Analyzed conversations', icon: '📊' },
+    { label: 'Avg Sentiment', value: avgSentiment, sub: 'Net sentiment score', icon: '💭' },
+    { label: 'Top Friction', value: topFriction, sub: 'Why people hold back', icon: '⚡' },
+    { label: 'Top Intent', value: topIntent, sub: 'Dominant buyer intent', icon: '🎯' },
   ];
 
   const cardStyles = [
-    { color: '#ff3f6c' },
-    { color: '#3b82f6' },
-    { color: '#10b981' },
-    { color: '#f59e0b' },
+    { gradient: 'from-myntra-pink to-myntra-neon-pink', bg: 'bg-myntra-pink/5', border: 'border-myntra-pink/30', text: 'text-myntra-pink' },
+    { gradient: 'from-myntra-orange to-amber-500', bg: 'bg-myntra-orange/5', border: 'border-myntra-orange/30', text: 'text-myntra-orange' },
+    { gradient: 'from-myntra-purple to-indigo-600', bg: 'bg-myntra-purple/5', border: 'border-myntra-purple/30', text: 'text-myntra-purple' },
+    { gradient: 'from-cyan-600 to-blue-600', bg: 'bg-cyan-600/5', border: 'border-cyan-600/30', text: 'text-cyan-700' },
   ];
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((card, i) => (
-        <div key={card.label} className="rounded-xl border-t-4 bg-white p-5 shadow-sm" style={{ borderTopColor: cardStyles[i].color }}>
-          <p className="text-sm text-myntra-text-light">{card.label}</p>
-          <p className="mt-1 text-2xl font-semibold" style={{ color: cardStyles[i].color }}>{card.value}</p>
+        <div
+          key={card.label}
+          className={`group relative overflow-hidden rounded-2xl bg-white p-5 shadow-md transition hover:shadow-xl hover:scale-[1.02] border-b-4 ${cardStyles[i].border}`}
+        >
+          {/* Gradient accent bar */}
+          <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${cardStyles[i].gradient}`} />
+
+          {/* Icon badge */}
+          <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${cardStyles[i].gradient} text-lg shadow-sm`}>
+            {card.icon}
+          </div>
+
+          <p className="text-sm font-medium text-myntra-text-light">{card.label}</p>
+          <p className={`mt-1 text-2xl font-bold ${cardStyles[i].text}`}>
+            {typeof card.value === 'number' ? card.value.toLocaleString() : card.value}
+          </p>
           <p className="mt-1 text-xs text-myntra-text-light">{card.sub}</p>
         </div>
       ))}

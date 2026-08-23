@@ -4,4 +4,82 @@
 
 body {
   @apply bg-myntra-gray text-myntra-text-dark antialiased;
+  background-image: linear-gradient(135deg, #fff5f7 0%, #f5f5f6 30%, #fff0e6 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f5f5f6;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #ff3f6c, #ff6f00);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #e6335b, #e65100);
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* Pulse glow for active elements */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 63, 108, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 63, 108, 0.6);
+  }
+}
+.animate-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #f5f5f6 25%, #ffe5ec 50%, #f5f5f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Select dropdown styling */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ff3f6c' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 20px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 32px !important;
+}
+
+/* Text visibility */
+.text-myntra-text-dark {
+  color: #1a1b2e !important;
+  font-weight: 600;
+}
+

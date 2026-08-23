@@ -1,7 +1,0 @@
-{$DOMAIN} {
-    # API requests go to the API Gateway
-    reverse_proxy /api/v1/* api-gateway:3000
-
-    # Everything else goes to the Next.js frontend
-    reverse_proxy frontend:3000
-}
