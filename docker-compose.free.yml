@@ -134,6 +134,78 @@ services:
       retries: 5
       start_period: 20s
 
+  # Celery Worker — processes async ingestion tasks
+  celery-worker:
+    build:
+      context: ./backend/data-ingestion
+      dockerfile: Dockerfile
+    container_name: myntra-celery-worker
+    command: celery -A src.tasks.scheduled_tasks worker --loglevel=info --concurrency=2
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-myntra_dashboard}
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-myntra_password}
+      POSTGRES_SSLMODE: disable
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
+      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      NLP_SERVICE_URL: http://nlp-service:8000
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      nlp-service:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+
+  # Celery Beat — schedules periodic ingestion tasks
+  celery-beat:
+    build:
+      context: ./backend/data-ingestion
+      dockerfile: Dockerfile
+    container_name: myntra-celery-beat
+    command: celery -A src.tasks.scheduled_tasks beat --loglevel=info
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-myntra_dashboard}
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-myntra_password}
+      POSTGRES_SSLMODE: disable
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
+      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      NLP_SERVICE_URL: http://nlp-service:8000
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+
   # Analytics & Aggregation Service (Python/FastAPI)
   analytics-service:
     build:
