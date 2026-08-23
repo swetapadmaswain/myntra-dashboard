@@ -1,6 +1,179 @@
 version: '3.8'
 
 services:
+  # ── Databases (self-hosted, no external services) ──────────
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: myntra-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-myntra_dashboard}
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-myntra_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-myntra_user} -d ${POSTGRES_DB:-myntra_dashboard}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  mongodb:
+    image: mongo:7
+    container_name: myntra-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER:-myntra_user}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
+      MONGO_INITDB_DATABASE: ${MONGODB_DB:-myntra_dashboard}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: myntra-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ── Backend Services ───────────────────────────────────────
+
+  # NLP Processing Service (Python/FastAPI) - lightweight VADER/spaCy
+  nlp-service:
+    build:
+      context: ./backend/nlp-service
+      dockerfile: Dockerfile
+    container_name: myntra-nlp-service
+    environment:
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
+      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Data Ingestion Service (Python/FastAPI)
+  data-ingestion:
+    build:
+      context: ./backend/data-ingestion
+      dockerfile: Dockerfile
+    container_name: myntra-data-ingestion
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-myntra_dashboard}
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-myntra_password}
+      POSTGRES_SSLMODE: disable
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
+      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      NLP_SERVICE_URL: http://nlp-service:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nlp-service:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8002/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # Analytics & Aggregation Service (Python/FastAPI)
+  analytics-service:
+    build:
+      context: ./backend/analytics-service
+      dockerfile: Dockerfile
+    container_name: myntra-analytics-service
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-myntra_dashboard}
+      POSTGRES_USER: ${POSTGRES_USER:-myntra_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-myntra_password}
+      POSTGRES_SSLMODE: disable
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
+      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nlp-service:
+        condition: service_healthy
+    networks:
+      - myntra-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8001/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
   # API Gateway (Node.js/Express)
   api-gateway:
     build:
@@ -10,23 +183,30 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      MONGODB_HOST: ${MONGODB_HOST}
-      MONGODB_PORT: ${MONGODB_PORT:-27017}
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      MONGODB_USER: ${MONGODB_USER:-myntra_user}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-myntra_password}
       MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       NLP_SERVICE_URL: http://nlp-service:8000
       ANALYTICS_SERVICE_URL: http://analytics-service:8001
       DATA_INGESTION_SERVICE_URL: http://data-ingestion:8002
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGINS: ${CORS_ORIGINS:-*}
     depends_on:
-      - nlp-service
-      - data-ingestion
-      - analytics-service
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nlp-service:
+        condition: service_healthy
+      data-ingestion:
+        condition: service_healthy
+      analytics-service:
+        condition: service_healthy
     networks:
       - myntra-network
     restart: unless-stopped
@@ -35,120 +215,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 15s
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-
-  # Data Ingestion Service (Python/FastAPI)
-  data-ingestion:
-    build:
-      context: ./backend/data-ingestion
-      dockerfile: Dockerfile
-    container_name: myntra-data-ingestion
-    environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_SSLMODE: ${POSTGRES_SSLMODE:-require}
-      MONGODB_HOST: ${MONGODB_HOST}
-      MONGODB_PORT: ${MONGODB_PORT:-27017}
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
-      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
-      NLP_SERVICE_URL: http://nlp-service:8000
-    depends_on:
-      - nlp-service
-    networks:
-      - myntra-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8002/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-
-  # NLP Processing Service (Python/FastAPI) - lightweight VADER/spaCy
-  nlp-service:
-    build:
-      context: ./backend/nlp-service
-      dockerfile: Dockerfile
-    container_name: myntra-nlp-service
-    environment:
-      MONGODB_HOST: ${MONGODB_HOST}
-      MONGODB_PORT: ${MONGODB_PORT:-27017}
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
-      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0
-      CELERY_RESULT_BACKEND: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/0
-    networks:
-      - myntra-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8000/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
       start_period: 20s
-    deploy:
-      resources:
-        limits:
-          memory: 256M
 
-  # Analytics & Aggregation Service (Python/FastAPI)
-  analytics-service:
-    build:
-      context: ./backend/analytics-service
-      dockerfile: Dockerfile
-    container_name: myntra-analytics-service
-    environment:
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_SSLMODE: ${POSTGRES_SSLMODE:-require}
-      MONGODB_HOST: ${MONGODB_HOST}
-      MONGODB_PORT: ${MONGODB_PORT:-27017}
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASSWORD: ${MONGODB_PASSWORD}
-      MONGODB_DB: ${MONGODB_DB:-myntra_dashboard}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-    depends_on:
-      - nlp-service
-    networks:
-      - myntra-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8001/health || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-
-  # Caddy reverse proxy — automatic HTTPS via Let's Encrypt
+  # ── Caddy reverse proxy — automatic HTTPS ──────────────────
   caddy:
     image: caddy:2-alpine
     container_name: myntra-caddy
@@ -162,19 +231,20 @@ services:
     environment:
       API_DOMAIN: ${API_DOMAIN}
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
     networks:
       - myntra-network
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 64M
 
 networks:
   myntra-network:
     driver: bridge
 
 volumes:
+  postgres_data:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
   caddy_data:
   caddy_config:
