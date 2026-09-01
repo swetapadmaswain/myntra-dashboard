@@ -67,9 +67,12 @@ class BehaviouralAnalyzer:
             if not conversations and not journey_events:
                 return self._get_empty_behavioural_analysis()
 
+            # If no journey events, derive funnel and session metrics from conversations
+            use_derived = not journey_events
+
             data = {
-                'summary': self._compute_summary(conversations, journey_events),
-                'funnel': self._compute_funnel(journey_events),
+                'summary': self._compute_summary(conversations, journey_events if not use_derived else []),
+                'funnel': self._compute_funnel(journey_events) if not use_derived else self._derive_funnel_from_conversations(conversations),
                 'intent_friction_matrix': self._compute_intent_friction_matrix(conversations),
                 'source_conversion_rates': self._compute_source_conversion_rates(conversations),
                 'hourly_activity': self._compute_hourly_activity(conversations),
@@ -77,6 +80,10 @@ class BehaviouralAnalyzer:
                 'sentiment_by_intent': self._compute_sentiment_by_intent(conversations),
                 'calculated_at': datetime.now().isoformat()
             }
+
+            if use_derived:
+                # Patch summary with derived session metrics
+                data['summary'].update(self._derive_session_metrics(conversations))
 
             redis_client.set(cache_key, data, self.cache_ttl)
             return data
@@ -260,6 +267,68 @@ class BehaviouralAnalyzer:
             'top_hesitant_users': [],
             'sentiment_by_intent': [],
             'calculated_at': datetime.now().isoformat()
+        }
+
+    def _derive_funnel_from_conversations(self, conversations: List[Dict]) -> List[Dict[str, Any]]:
+        """Derive a journey funnel from conversation intent data"""
+        total = len(conversations)
+        if total == 0:
+            return []
+
+        intent_counts = Counter(c.get('intent', 'unknown') for c in conversations)
+        research = intent_counts.get('research', 0)
+        comparison = intent_counts.get('comparison', 0)
+        immediate_purchase = intent_counts.get('immediate_purchase', 0)
+
+        # Map intents to funnel steps
+        step_counts = [
+            ('product_view', total),
+            ('add_to_wishlist', total),
+            ('view_similar_products', research + comparison),
+            ('read_reviews', research),
+            ('add_to_cart', immediate_purchase),
+            ('checkout_initiated', immediate_purchase),
+            ('checkout_completed', sum(
+                1 for c in conversations
+                if c.get('intent') == 'immediate_purchase' and not c.get('hesitation_driver')
+            )),
+        ]
+
+        counts = []
+        for step, count in step_counts:
+            counts.append({'step': step, 'count': count})
+
+        first_count = counts[0]['count'] if counts else 0
+        for item in counts:
+            item['percentage'] = round((item['count'] / first_count) * 100, 2) if first_count > 0 else 0
+
+        return counts
+
+    def _derive_session_metrics(self, conversations: List[Dict]) -> Dict[str, Any]:
+        """Derive session-level metrics from conversations when no journey events exist"""
+        total = len(conversations)
+        # Treat each conversation as a pseudo-session
+        total_sessions = total
+        total_events = total
+        avg_actions = 1.0
+
+        # Bounce: conversations with no clear intent progression (only one signal)
+        bounce_sessions = sum(1 for c in conversations if not c.get('intent') or c.get('intent') == 'unknown')
+        bounce_rate = round((bounce_sessions / total_sessions) * 100, 2) if total_sessions > 0 else 0
+
+        # Conversion: immediate_purchase with no hesitation
+        converted = sum(
+            1 for c in conversations
+            if c.get('intent') == 'immediate_purchase' and not c.get('hesitation_driver')
+        )
+        conversion_rate = round((converted / total_sessions) * 100, 2) if total_sessions > 0 else 0
+
+        return {
+            'total_sessions': total_sessions,
+            'total_events': total_events,
+            'avg_actions_per_session': avg_actions,
+            'bounce_rate': bounce_rate,
+            'conversion_rate': conversion_rate,
         }
 
 

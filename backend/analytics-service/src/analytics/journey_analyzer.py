@@ -70,7 +70,6 @@ class JourneyAnalyzer:
         
         try:
             # Fetch user journey events from MongoDB
-            # Journey events are not conversation snippets, so only time/segment filters apply
             query = self._build_time_query(start_date, end_date)
             if segment_id:
                 query['metadata.segment_id'] = segment_id
@@ -81,17 +80,20 @@ class JourneyAnalyzer:
                 limit=50000
             )
             
-            if not events:
-                logger.warning(f"No journey events found for segment {segment_id}, time range {time_range}")
-                return self._get_empty_journey_tracker()
-            
-            # Calculate journey metrics
-            journey_data = self._calculate_journey_from_events(events)
+            if events:
+                # Calculate journey metrics from real events
+                journey_data = self._calculate_journey_from_events(events)
+            else:
+                # No journey events — derive funnel from raw_conversations intent data
+                logger.info(f"No journey events found, deriving funnel from conversations")
+                conv_query = self._build_conversation_query(start_date, end_date, source, sentiment, hesitation_driver)
+                conversations = mongodb_client.find('raw_conversations', conv_query, limit=50000)
+                journey_data = self._derive_funnel_from_conversations(conversations)
             
             # Store in cache
             redis_client.set(cache_key, journey_data, self.cache_ttl)
             
-            logger.info(f"Calculated journey tracker for segment {segment_id}: {len(events)} events")
+            logger.info(f"Calculated journey tracker for segment {segment_id}: {journey_data.get('total_events', 0)} events")
             return journey_data
             
         except Exception as e:
@@ -110,6 +112,140 @@ class JourneyAnalyzer:
                 '$gte': start_date,
                 '$lte': end_date
             }
+        }
+    
+    def _build_conversation_query(
+        self, start_date: datetime, end_date: datetime,
+        source: Optional[str] = None,
+        sentiment: Optional[str] = None,
+        hesitation_driver: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Build MongoDB query for raw_conversations with filters"""
+        query: Dict[str, Any] = {
+            'timestamp': {'$gte': start_date, '$lte': end_date},
+            'processed': True
+        }
+        if source:
+            query['source'] = source
+        if sentiment:
+            query['sentiment'] = sentiment
+        if hesitation_driver:
+            query['hesitation_driver'] = hesitation_driver
+        return query
+    
+    def _derive_funnel_from_conversations(self, conversations: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Derive a journey funnel from raw conversation intent data.
+        Maps intent types to journey steps:
+          - All conversations start at product_view
+          - research intent → view_similar_products + read_reviews
+          - comparison intent → view_similar_products
+          - bookmarking intent → add_to_wishlist
+          - immediate_purchase intent → add_to_cart → checkout_initiated → checkout_completed
+          - conversations with hesitation_driver → checkout_abandoned (subset)
+        """
+        total = len(conversations)
+        if total == 0:
+            return self._get_empty_journey_tracker()
+
+        intent_counts = Counter(c.get('intent', 'unknown') for c in conversations)
+        hesitation_count = sum(1 for c in conversations if c.get('hesitation_driver'))
+
+        research = intent_counts.get('research', 0)
+        comparison = intent_counts.get('comparison', 0)
+        bookmarking = intent_counts.get('bookmarking', 0)
+        immediate_purchase = intent_counts.get('immediate_purchase', 0)
+
+        # Build funnel counts (each step includes all users who progressed to or past it)
+        # Step 1: product_view — everyone who expressed any interest
+        product_view = total
+
+        # Step 2: add_to_wishlist — all conversations represent wishlist-related discussions
+        add_to_wishlist = total
+
+        # Step 3: view_similar_products — users doing research or comparison
+        view_similar = research + comparison
+
+        # Step 4: read_reviews — users doing research (subset of view_similar)
+        read_reviews = research
+
+        # Step 5: add_to_cart — users with immediate purchase intent
+        add_to_cart = immediate_purchase
+
+        # Step 6: checkout_initiated — users with immediate purchase intent (started checkout)
+        checkout_initiated = immediate_purchase
+
+        # Step 7: checkout_completed — users with immediate purchase and no hesitation
+        checkout_completed = sum(
+            1 for c in conversations
+            if c.get('intent') == 'immediate_purchase' and not c.get('hesitation_driver')
+        )
+
+        # Step 8: checkout_abandoned — users with immediate purchase but hesitation
+        checkout_abandoned = sum(
+            1 for c in conversations
+            if c.get('intent') == 'immediate_purchase' and c.get('hesitation_driver')
+        )
+
+        step_counts = [
+            ('product_view', product_view),
+            ('add_to_wishlist', add_to_wishlist),
+            ('view_similar_products', view_similar),
+            ('read_reviews', read_reviews),
+            ('add_to_cart', add_to_cart),
+            ('checkout_initiated', checkout_initiated),
+            ('checkout_completed', checkout_completed),
+            ('checkout_abandoned', checkout_abandoned),
+        ]
+
+        funnel_data = []
+        previous_count = total
+        for i, (step_name, count) in enumerate(step_counts):
+            percentage = round((count / total) * 100, 2) if total > 0 else 0
+            drop_off_rate = round(((previous_count - count) / previous_count) * 100, 2) if previous_count > 0 else 0
+            cumulative = round((1 - count / total) * 100, 2) if total > 0 else 0
+            funnel_data.append({
+                'step_name': step_name,
+                'step_order': i + 1,
+                'percentage': percentage,
+                'count': count,
+                'drop_off_rate': drop_off_rate,
+                'cumulative_drop_off': cumulative
+            })
+            previous_count = count
+
+        # Build common paths from intent sequences
+        path_counts = Counter()
+        for c in conversations:
+            intent = c.get('intent', 'unknown')
+            has_hesitation = bool(c.get('hesitation_driver'))
+            if intent == 'research':
+                path = 'product_view -> view_similar_products -> read_reviews'
+            elif intent == 'comparison':
+                path = 'product_view -> view_similar_products -> add_to_wishlist'
+            elif intent == 'bookmarking':
+                path = 'product_view -> add_to_wishlist'
+            elif intent == 'immediate_purchase':
+                if has_hesitation:
+                    path = 'product_view -> add_to_wishlist -> add_to_cart -> checkout_abandoned'
+                else:
+                    path = 'product_view -> add_to_wishlist -> add_to_cart -> checkout_completed'
+            else:
+                path = 'product_view -> add_to_wishlist'
+            path_counts[path] += 1
+
+        common_paths = [
+            {'path': path, 'count': count, 'percentage': round((count / total) * 100, 2)}
+            for path, count in path_counts.most_common(5)
+        ]
+
+        return {
+            'funnel_data': funnel_data,
+            'common_paths': common_paths,
+            'time_metrics': {},
+            'total_sessions': total,
+            'total_events': total,
+            'calculated_at': datetime.now().isoformat()
         }
     
     def _calculate_journey_from_events(self, events: list) -> Dict[str, Any]:
